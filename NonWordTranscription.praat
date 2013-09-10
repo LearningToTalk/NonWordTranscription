@@ -12,61 +12,164 @@ wordListDirectory$    = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/T
 transLogDirectory$      = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/NonwordTranscriptionLogs"
 transDirectory$  = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/NonwordTranscriptionTextGrids"
 
-# Manner feature values for the target consonants.
+# Manner feature values for the consonants.
 stop$      = "Stop"
 affricate$ = "Affricate"
 fricative$ = "Fricative"
 nasal$     = "Nasal"
 glide$     = "Glide"
 omitted$   = "Omitted"
-manner_b$  = stop$
-manner_d$  = stop$
-manner_f$  = fricative$
-manner_g$  = stop$
-manner_j$  = glide$
-manner_k$  = stop$
-manner_m$  = nasal$
-manner_n$  = nasal$
-manner_p$  = stop$
-manner_t$  = stop$
-manner_v$  = fricative$
-manner_w$  = glide$
+manner_p$        = stop$
+manner_b$        = stop$
+manner_t$        = stop$
+manner_d$        = stop$
+manner_tr$       = stop$
+manner_dr$       = stop$
+manner_tFlap$    = stop$
+manner_dFlap$    = stop$
+manner_c$        = stop$
+manner_J$        = stop$
+manner_k$        = stop$
+manner_g$        = stop$
+manner_q$        = stop$
+manner_Q$        = stop$
+manner_glotStop$ = stop$
+manner_ts$       = affricate$
+manner_dz$       = affricate$
+manner_tS$       = affricate$
+manner_dZ$       = affricate$
+manner_F$        = fricative$
+manner_V$        = fricative$
+manner_f$        = fricative$
+manner_v$        = fricative$
+manner_T$        = fricative$
+manner_D$        = fricative$
+manner_s$        = fricative$
+manner_z$        = fricative$
+manner_S$        = fricative$
+manner_Z$        = fricative$
+manner_C$        = fricative$
+manner_jV$       = fricative$
+manner_x$        = fricative$
+manner_G$        = fricative$
+manner_X$        = fricative$
+manner_K$        = fricative$
+manner_H$        = fricative$
+manner_exclaim$  = fricative$
+manner_h$        = fricative$
+manner_hv$       = fricative$
+manner_m$        = nasal$
+manner_n$        = nasal$
+manner_N$        = nasal$
+manner_j$        = glide$
+manner_w$        = glide$
 
-# Place feature values for the target consonants.
-bilabial$    = "Bilabial"
-alveolar$    = "Alveolar"
-labiodental$ = "Labiodental"
-velar$       = "Velar"
-palatal$     = "Palatal"
-labiovelar$  = "Labiovelar"
-place_b$     = bilabial$
-place_d$     = alveolar$
-place_f$     = labiodental$
-place_g$     = velar$
-place_j$     = palatal$
-place_k$     = velar$
-place_m$     = bilabial$
-place_n$     = alveolar$
-place_p$     = bilabial$
-place_t$     = alveolar$
-place_v$     = labiodental$
-place_w$     = labiovelar$
+# Place feature values for the consonants.
+bilabial$     = "Bilabial"
+labiodental$  = "Labiodental"
+dental$       = "Dental"
+alveolar$     = "Alveolar"
+postalveolar$ = "Postalveolar"
+retroflex$    = "Retroflex"
+palatal$      = "Palatal"
+velar$        = "Velar"
+uvular$       = "Uvular"
+pharyngeal$   = "Pharyngeal"
+glottal$      = "Glottal"
+labiovelar$   = "Labiovelar"
+other$        = "Other"
+place_p$        = bilabial$
+place_b$        = bilabial$
+place_t$        = alveolar$
+place_d$        = alveolar$
+place_tr$       = retroflex$
+place_dr$       = retroflex$
+place_tFlap$    = alveolar$
+place_dFlap$    = alveolar$
+place_c$        = palatal$
+place_J$        = palatal$
+place_k$        = velar$
+place_g$        = velar$
+place_q$        = uvular$
+place_Q$        = uvular$
+place_glotStop$ = glottal$
+place_ts$       = alveolar$
+place_dz$       = alveolar$
+place_tS$       = postalveolar$
+place_dZ$       = postalveolar$
+place_F$        = bilabial$
+place_V$        = bilabial$
+place_f$        = labiodental$
+place_v$        = labiodental$
+place_T$        = dental$
+place_D$        = dental$
+place_s$        = alveolar$
+place_z$        = alveolar$
+place_S$        = postalveolar$
+place_Z$        = postalveolar$
+place_C$        = palatal$
+place_jV$       = palatal$
+place_x$        = velar$
+place_G$        = velar$
+place_X$        = uvular$
+place_K$        = uvular$
+place_H$        = pharyngeal$
+place_exclaim$  = pharyngeal$
+place_h$        = glottal$
+place_hv$       = glottal$
+place_m$        = bilabial$
+place_n$        = alveolar$
+place_N$        = velar$
+place_j$        = palatal$
+place_w$        = labiovelar$
 
-# Voicing feature values for the target consonants.
+# Voicing feature values for the consonants.
 voiced$    = "Voiced"
 voiceless$ = "Voiceless"
-voicing_b$ = voiced$
-voicing_d$ = voiced$
-voicing_f$ = voiceless$
-voicing_g$ = voiced$
-voicing_j$ = voiced$
-voicing_k$ = voiceless$
-voicing_m$ = voiced$
-voicing_n$ = voiced$
-voicing_p$ = voiceless$
-voicing_t$ = voiceless$
-voicing_v$ = voiced$
-voicing_w$ = voiced$
+voicing_p$        = voiceless$
+voicing_b$        = voiced$
+voicing_t$        = voiceless$
+voicing_d$        = voiced$
+voicing_tr$       = voiceless$
+voicing_dr$       = voiced$
+voicing_tFlap$    = voiceless$
+voicing_dFlap$    = voiced$
+voicing_c$        = voiceless$
+voicing_J$        = voiced$
+voicing_k$        = voiceless$
+voicing_g$        = voiced$
+voicing_q$        = voiceless$
+voicing_Q$        = voiced$
+voicing_glotStop$ = voiceless$
+voicing_ts$       = voiceless$
+voicing_dz$       = voiced$
+voicing_tS$       = voiceless$
+voicing_dZ$       = voiced$
+voicing_F$        = voiceless$
+voicing_V$        = voiced$
+voicing_f$        = voiceless$
+voicing_v$        = voiced$
+voicing_T$        = voiceless$
+voicing_D$        = voiced$
+voicing_s$        = voiceless$
+voicing_z$        = voiced$
+voicing_S$        = voiceless$
+voicing_Z$        = voiced$
+voicing_C$        = voiceless$
+voicing_jV$       = voiced$
+voicing_x$        = voiceless$
+voicing_G$        = voiced$
+voicing_X$        = voiceless$
+voicing_K$        = voiced$
+voicing_H$        = voiceless$
+voicing_exclaim$  = voiced$
+voicing_h$        = voiceless$
+voicing_hv$       = voiced$
+voicing_m$        = voiced$
+voicing_n$        = voiced$
+voicing_N$        = voiced$
+voicing_j$        = voiced$
+voicing_w$        = voiced$
 
 # Height feature values for the target vowels.
 high$      = "High"
@@ -511,6 +614,7 @@ if nTrialsTranscribedCV < nTrialsCV
         targetConsonant$ = Get value... 'trial' 'wordListTarget1$'
         targetVowel$     = Get value... 'trial' 'wordListTarget2$'
         # Prompt the transcriber to the select the consonant's manner feature.
+        ######## begin edit #####################
         beginPause ("Consonant Transcription")
           comment ("Trial number: 'trialNumber$'")
           comment ("Target nonword: 'targetNonword$'")
@@ -523,179 +627,402 @@ if nTrialsTranscribedCV < nTrialsCV
             option (nasal$)
             option (glide$)
             option (omitted$)
-          optionMenu ("Consonant place", 1)
-            option (bilabial$)
-            option (alveolar$)
-            option (labiodental$)
-            option (velar$)
-            option (palatal$)
-            option (labiovelar$)
-          optionMenu ("Consonant voicing", 1)
-            option (voiced$)
-            option (voiceless$)
         button = endPause ("Quit", "Transcribe it!", 2, 1)
         # Check whether the transcriber decided to transcribe the consonant or quit.
         if button == 2
-          # If the transcriber chose to transcribe the consonant...
-          # Concatenate the consonant's manner, place, and voicing
-          # feature values into a string that determines its transcription.
-          consonantFeatures$ = "'consonant_manner$', 'consonant_place$', 'consonant_voicing$'"
-          consonantTranscription$ = consonantFeatures$
-          select TextGrid 'transBasename$'
-          consonantSegInterval = Get interval at time... 'transTextGridTarget1Seg' 'segmentXMid'
-          Set interval text... 'transTextGridTarget1Seg' 'consonantSegInterval' 'consonantTranscription$'
-          # Prompt the transcriber to select the vowel's feature values.
-          beginPause ("Vowel Transcription")
-            comment ("Trial number: 'trialNumber$'")
-            comment ("Target nonword: 'targetNonword$'")
-            comment ("Target consonant: 'targetConsonant$'")
-            comment ("Target vowel: 'targetVowel$'")
-            optionMenu ("Vowel height", 1)
-              option (high$)
-              option (mid$)
-              option (low$)
-            optionMenu ("Vowel frontness", 1)
-              option (front$)
-              option (central$)
-              option (back$)
-            optionMenu ("Vowel length", 1)
-              option (tense$)
-              option (lax$)
-              option (diphthong$)
-          button = endPause ("", "Transcribe it!", 2, 1)
-          if button == 2
-            # Compute the vowel's segmental score.
-            vowelScore = 0
-            if height_'targetVowel$'$ == vowel_height$
-              vowelScore = vowelScore + 1
-            endif
-            if frontness_'targetVowel$'$ == vowel_frontness$
-              vowelScore = vowelScore + 1
-            endif
-            if length_'targetVowel$'$ == vowel_length$
-              vowelScore = vowelScore + 1
-            endif
-            # Concatenate the vowel's height, frontness, and length
-            # feature values into a string that determines its transcription.
-            vowelFeatures$ = "'vowel_height$', 'vowel_frontness$', 'vowel_length$'"
-            # Add the vowel transcription to the TextGrid.
-            #vowelTranscription$ = "'vowelScore'"
-            vowelTranscription$ = vowelFeatures$
-            select TextGrid 'transBasename$'
-            vowelSegInterval = Get interval at time... 'transTextGridTarget2Seg' 'segmentXMid'
-            Set interval text... 'transTextGridTarget2Seg' 'vowelSegInterval' 'vowelTranscription$'
-            # Prompt the transcriber to transcribe the target CV prosodically.
-            beginPause ("Prosodic Transcription")
+          # If the transcriber chose to transcribe the consonant, then
+          # check the value of the 'consonant_manner$' feature.
+          if consonant_manner$ <> omitted$
+            # If the consonant was not omitted, then prompt the transcriber
+            # to select the consonant's transcription from a list of
+            # WorldBet symbols.
+            consonantManner$ = consonant_manner$
+            beginPause ("Consonant Transcription")
               comment ("Trial number: 'trialNumber$'")
               comment ("Target nonword: 'targetNonword$'")
               comment ("Target consonant: 'targetConsonant$'")
               comment ("Target vowel: 'targetVowel$'")
-              comment ("Is the target sequence prosodically organized correctly?")
-              optionMenu ("Prosodic organization", 1)
-                option ("Yes")
-                option ("No")
+              optionMenu ("Consonant transcription", 1)
+                if consonantManner$ == stop$
+                  option ("p")
+                  option ("b")
+                  option ("t")
+                  option ("d")
+                  option ("tr")
+                  option ("dr")
+                  option ("t(")
+                  option ("d(")
+                  option ("c")
+                  option ("J")
+                  option ("k")
+                  option ("g")
+                  option ("q")
+                  option ("Q")
+                  option ("?")
+                  option (other$)
+                elsif consonantManner$ == affricate$
+                  option ("ts")
+                  option ("dz")
+                  option ("tS")
+                  option ("dZ")
+                  option (other$)
+                elsif consonantManner$ == fricative$
+                  option ("F")
+                  option ("V")
+                  option ("f")
+                  option ("v")
+                  option ("T")
+                  option ("D")
+                  option ("s")
+                  option ("z")
+                  option ("S")
+                  option ("Z")
+                  option ("C")
+                  option ("j^")
+                  option ("x")
+                  option ("G")
+                  option ("X")
+                  option ("K")
+                  option ("H")
+                  option ("!")
+                  option ("h")
+                  option ("hv")
+                  option (other$)
+                elsif consonantManner$ == nasal$
+                  option ("m")
+                  option ("n")
+                  option ("N")
+                  option (other$)
+                elsif consonantManner$ == glide$
+                  option ("j")
+                  option ("w")
+                  option (other$)
+                endif
             button = endPause ("", "Transcribe it!", 2, 1)
+            # Check which button the transcriber clicked.
             if button == 2
-              # Use the value of 'prosodic_transcription' to determine
-              # whether the transcriber must judge the number of syllables
-              # spanned by the target sequence.
-              if prosodic_organization <> 1
-                beginPause ("Prosodic Transcription")
+              # Check whether the transcriber selected a WorldBet symbol.
+              if consonant_transcription$ <> "Other"
+                # If the transcriber selected a WorldBet symbol, then
+                # parse its features.
+                # Translate the 'consonant_transcription$' to a character
+                # key that can be used to look up the Place and Voicing
+                # features.
+                if consonant_transcription$ == "t("
+                  consonantKey$ = "tFlap"
+                elsif consonant_transcription$ == "d("
+                  consonantKey$ = "dFlap"
+                elsif consonant_transcription$ == "?"
+                  consonantKey$ = "glotStop"
+                elsif consonant_transcription$ == "j^"
+                  consonantKey$ = "jV"
+                elsif consonant_transcription$ == "!"
+                  consonantKey$ = "exclaim"
+                else
+                  consonantKey$ = consonant_transcription$
+                endif
+                # Use the 'consonantKey$' to look up the Place and
+                # Voicing features.
+                consonantSymbol$ = consonant_transcription$
+                consonantPlace$ = place_'consonantKey$'$
+                consonantVoicing$ = voicing_'consonantKey$'$
+                # Set the switch to transcribe the vowel.
+                transcribeVowel = 1
+              else
+                # If the transcriber did not select a WorldBet symbol,
+                # then prompt her to select the Place and Voicing features
+                # from drop-down menus.
+                beginPause ("Consonant Transcription")
                   comment ("Trial number: 'trialNumber$'")
                   comment ("Target nonword: 'targetNonword$'")
                   comment ("Target consonant: 'targetConsonant$'")
                   comment ("Target vowel: 'targetVowel$'")
-                  comment ("Does the target sequence span the correct number of syllables?")
-                  optionMenu ("Syllable span", 1)
-                    option ("Yes")
-                    option ("No")
+                  optionMenu ("Consonant place", 1)
+                    option (bilabial$)
+                    option (labiodental$)
+                    option (labiovelar$)
+                    option (dental$)
+                    option (alveolar$)
+                    option (postalveolar$)
+                    option (retroflex$)
+                    option (palatal$)
+                    option (velar$)
+                    option (uvular$)
+                    option (pharyngeal$)
+                    option (glottal$)
+                  optionMenu ("Consonant voicing", 1)
+                    option (voiced$)
+                    option (voiceless$)
                 button = endPause ("", "Transcribe it!", 2, 1)
                 if button == 2
-                  # Use the value of 'syllable_span' to determine the score
-                  # for the prosodic transcription.
-                  if syllable_span <> 1
-                    # The target sequence was neither prosodically organized 
-                    # correctly, nor did it span the correct number of syllables.
-                    prosodyScore = 0
-                  else
-                    # The target sequence was not prosodically organized
-                    # correctly, but it did span the correct number of 
-                    # syllables---e.g., an emergent production of a fricative.
-                    prosodyScore = 1
-                  endif
-                  # Add the 'prosodyScore' transcription to the Nonword
-                  # Transcription TextGrid.
-                  prosodyTranscription$ = "'prosodyScore'"
-                  select TextGrid 'transBasename$'
-                  prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
-                  Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
-                  # Save the Nonword Transcription TextGrid.
-                  select TextGrid 'transBasename$'
-                  Save as text file... 'transFilepath$'
-                  # Update the number of CV-trials that have been transcribed.
-                  select Table 'transLogBasename$'
-                  Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
-                  # Save the Nonword Transcription Log.
-                  Save as tab-separated file... 'transLogFilepath$'
+                  # Use the transcriber's selections to set the 
+                  # Place and Voicing features of the consonant.
+                  consonantSymbol$ = ""
+                  consonantPlace$ = consonant_place$
+                  consonantVoicing$ = consonant_voicing$
+                  # Set the switch to transcribe the vowel.
+                  transcribeVowel = 1
                 else
                   # If the transcriber (accidentally) hit the blank button
-                  # (i.e., the left-most button) during the prosody-transcription
+                  # (i.e., the left-most button) during the vowel-transcription
                   # phase, then print a message letting them know that they
                   # need to clear all of their Praat objects and rerun the
                   # script.
-                  printline Error during Prosody Transcription:
-                  printline   Clicking the blank button during the Prosody Transcription phase
+                  printline Error during Vowel Transcription:
+                  printline   Clicking the blank button during the Consonant Transcription phase
                   printline   causes a fatal script error.
                   printline   Clear all of the objects from the Praat Object list, and then
                   printline   rerun the script if you would like to continue transcribing.
                   printline
                   trial = nTrialsCV + 1
+                  # Set the switch not to transcribe the vowel.
+                  transcribeVowel = 0
                 endif
-              else
-                # The target sequence was prosodically organized correctly;
-                # hence, it also spanned the correct number of syllables.
-                prosodyScore = 2
               endif
-              # Add the 'prosodyScore' transcription to the TextGrid.
-              prosodyTranscription$ = "'prosodyScore'"
-              select TextGrid 'transBasename$'
-              prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
-              Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
-              # Save the Nonword Transcription TextGrid.
-              select TextGrid 'transBasename$'
-              Save as text file... 'transFilepath$'
-              # Update the number of CV-trials that have been transcribed.
-              select Table 'transLogBasename$'
-              Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
-              # Save the Nonword Transcription Log.
-              Save as tab-separated file... 'transLogFilepath$'
-            else
+            else 
               # If the transcriber (accidentally) hit the blank button
-              # (i.e., the left-most button) during the prosody-transcription
+              # (i.e., the left-most button) during the vowel-transcription
               # phase, then print a message letting them know that they
               # need to clear all of their Praat objects and rerun the
               # script.
-              printline Error during Prosody Transcription:
-              printline   Clicking the blank button during the Prosody Transcription phase
+              printline Error during Vowel Transcription:
+              printline   Clicking the blank button during the Consonant Transcription phase
+              printline   causes a fatal script error.
+              printline   Clear all of the objects from the Praat Object list, and then
+              printline   rerun the script if you would like to continue transcribing.
+              printline
+              trial = nTrialsCV + 1
+              # Set the switch not to transcribe the vowel.
+              transcribeVowel = 0
+            endif
+          else
+            # If the consonant was omitted (i.e., not produced in the
+            # attempted repetition of the target word), then ...
+            # ... the consonant symbol is Omitted.
+            consonantSymbol$ = omitted$
+            # ... each of the consonant's features is Omitted.
+            consonantManner$   = omitted$
+            consonantPlace$    = omitted$
+            consonantVoicing$  = omitted$
+            # Set the switch to transcribe the vowel.
+            transcribeVowel = 1
+          endif
+          # Decisions made up to this point:
+          # 1. Transcribe the consonant, but the blank button may
+          #    have been pressed during the Consonant Transcription
+          #    phase, which will ruin everything below.
+          #    Relevant variable: transcribeVowel
+          # 2. If transcribeVowel == 1, then the consonant has been
+          #    transcribed for its Manner, Place, and Voicing features.
+          if transcribeVowel == 1
+            # If the vowel is to be transcribed, then the consonant's
+            # feature values have been determined, which means that its
+            # segmental score and its transcription can be determined
+            # and entered into the TextGrid.
+            # Compute the consonant's segmental score.
+            consonantScore = 0
+            if manner_'targetConsonant$'$ == consonantManner$
+              consonantScore = consonantScore + 1
+            endif
+            if place_'targetConsonant$'$ == consonantPlace$
+              consonantScore = consonantScore + 1
+            endif
+            if voicing_'targetConsonant$'$ == consonantVoicing$
+              consonantScore = consonantScore + 1
+            endif
+            # Determine the consonant's transcription.
+            consonantTranscription$ = "'consonantSymbol$';'consonantManner$','consonantPlace$','consonantVoicing$';'consonantScore'"
+            # Add the 'consonantTranscription$' to the TextGrid
+            select TextGrid 'transBasename$'
+            consonantSegInterval = Get interval at time... 'transTextGridTarget1Seg' 'segmentXMid'
+            Set interval text... 'transTextGridTarget1Seg' 'consonantSegInterval' 'consonantTranscription$'
+        ########  end edit  #####################
+#        beginPause ("Consonant Transcription")
+#          comment ("Trial number: 'trialNumber$'")
+#          comment ("Target nonword: 'targetNonword$'")
+#          comment ("Target consonant: 'targetConsonant$'")
+#          comment ("Target vowel: 'targetVowel$'")
+#          optionMenu ("Consonant manner", 1)
+#            option (stop$)
+#            option (affricate$)
+#            option (fricative$)
+#            option (nasal$)
+#            option (glide$)
+#            option (omitted$)
+#          optionMenu ("Consonant place", 1)
+#            option (bilabial$)
+#            option (alveolar$)
+#            option (labiodental$)
+#            option (velar$)
+#            option (palatal$)
+#            option (labiovelar$)
+#          optionMenu ("Consonant voicing", 1)
+#            option (voiced$)
+#            option (voiceless$)
+#        button = endPause ("Quit", "Transcribe it!", 2, 1)
+#        # Check whether the transcriber decided to transcribe the consonant or quit.
+#        if button == 2
+#          # If the transcriber chose to transcribe the consonant...
+#          # Concatenate the consonant's manner, place, and voicing
+#          # feature values into a string that determines its transcription.
+#          consonantFeatures$ = "'consonant_manner$', 'consonant_place$', 'consonant_voicing$'"
+#          consonantTranscription$ = consonantFeatures$
+#          select TextGrid 'transBasename$'
+#          consonantSegInterval = Get interval at time... 'transTextGridTarget1Seg' 'segmentXMid'
+#          Set interval text... 'transTextGridTarget1Seg' 'consonantSegInterval' 'consonantTranscription$'
+            # Prompt the transcriber to select the vowel's feature values.
+            beginPause ("Vowel Transcription")
+              comment ("Trial number: 'trialNumber$'")
+              comment ("Target nonword: 'targetNonword$'")
+              comment ("Target consonant: 'targetConsonant$'")
+              comment ("Target vowel: 'targetVowel$'")
+              optionMenu ("Vowel height", 1)
+                option (high$)
+                option (mid$)
+                option (low$)
+              optionMenu ("Vowel frontness", 1)
+                option (front$)
+                option (central$)
+                option (back$)
+              optionMenu ("Vowel length", 1)
+                option (tense$)
+                option (lax$)
+                option (diphthong$)
+            button = endPause ("", "Transcribe it!", 2, 1)
+            if button == 2
+              # Compute the vowel's segmental score.
+              vowelScore = 0
+              if height_'targetVowel$'$ == vowel_height$
+                vowelScore = vowelScore + 1
+              endif
+              if frontness_'targetVowel$'$ == vowel_frontness$
+                vowelScore = vowelScore + 1
+              endif
+              if length_'targetVowel$'$ == vowel_length$
+                vowelScore = vowelScore + 1
+              endif
+              # Concatenate the vowel's height, frontness, and length
+              # feature values into a string that determines its transcription.
+              #vowelFeatures$ = "'vowel_height$', 'vowel_frontness$', 'vowel_length$'"
+              # Add the vowel transcription to the TextGrid.
+              #vowelTranscription$ = "'vowelScore'"
+              vowelTranscription$ = "'vowel_height$','vowel_frontness$','vowel_length$';'vowelScore'"
+              select TextGrid 'transBasename$'
+              vowelSegInterval = Get interval at time... 'transTextGridTarget2Seg' 'segmentXMid'
+              Set interval text... 'transTextGridTarget2Seg' 'vowelSegInterval' 'vowelTranscription$'
+              # Prompt the transcriber to transcribe the target CV prosodically.
+              beginPause ("Prosodic Transcription")
+                comment ("Trial number: 'trialNumber$'")
+                comment ("Target nonword: 'targetNonword$'")
+                comment ("Target consonant: 'targetConsonant$'")
+                comment ("Target vowel: 'targetVowel$'")
+                comment ("Is the target sequence prosodically organized correctly?")
+                optionMenu ("Prosodic organization", 1)
+                  option ("Yes")
+                  option ("No")
+              button = endPause ("", "Transcribe it!", 2, 1)
+              if button == 2
+                # Use the value of 'prosodic_transcription' to determine
+                # whether the transcriber must judge the number of syllables
+                # spanned by the target sequence.
+                if prosodic_organization <> 1
+                  beginPause ("Prosodic Transcription")
+                    comment ("Trial number: 'trialNumber$'")
+                    comment ("Target nonword: 'targetNonword$'")
+                    comment ("Target consonant: 'targetConsonant$'")
+                    comment ("Target vowel: 'targetVowel$'")
+                    comment ("Does the target sequence span the correct number of syllables?")
+                    optionMenu ("Syllable span", 1)
+                      option ("Yes")
+                      option ("No")
+                  button = endPause ("", "Transcribe it!", 2, 1)
+                  if button == 2
+                    # Use the value of 'syllable_span' to determine the score
+                    # for the prosodic transcription.
+                    if syllable_span <> 1
+                      # The target sequence was neither prosodically organized 
+                      # correctly, nor did it span the correct number of syllables.
+                      prosodyScore = 0
+                    else
+                      # The target sequence was not prosodically organized
+                      # correctly, but it did span the correct number of 
+                      # syllables---e.g., an emergent production of a fricative.
+                      prosodyScore = 1
+                    endif
+                    # Add the 'prosodyScore' transcription to the Nonword
+                    # Transcription TextGrid.
+                    prosodyTranscription$ = "'prosodyScore'"
+                    select TextGrid 'transBasename$'
+                    prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
+                    Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
+                    # Save the Nonword Transcription TextGrid.
+                    select TextGrid 'transBasename$'
+                    Save as text file... 'transFilepath$'
+                    # Update the number of CV-trials that have been transcribed.
+                    select Table 'transLogBasename$'
+                    Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
+                    # Save the Nonword Transcription Log.
+                    Save as tab-separated file... 'transLogFilepath$'
+                  else
+                    # If the transcriber (accidentally) hit the blank button
+                    # (i.e., the left-most button) during the prosody-transcription
+                    # phase, then print a message letting them know that they
+                    # need to clear all of their Praat objects and rerun the
+                    # script.
+                    printline Error during Prosody Transcription:
+                    printline   Clicking the blank button during the Prosody Transcription phase
+                    printline   causes a fatal script error.
+                    printline   Clear all of the objects from the Praat Object list, and then
+                    printline   rerun the script if you would like to continue transcribing.
+                    printline
+                    trial = nTrialsCV + 1
+                  endif
+                else
+                  # The target sequence was prosodically organized correctly;
+                  # hence, it also spanned the correct number of syllables.
+                  prosodyScore = 2
+                endif
+                # Add the 'prosodyScore' transcription to the TextGrid.
+                prosodyTranscription$ = "'prosodyScore'"
+                select TextGrid 'transBasename$'
+                prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
+                Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
+                # Save the Nonword Transcription TextGrid.
+                select TextGrid 'transBasename$'
+                Save as text file... 'transFilepath$'
+                # Update the number of CV-trials that have been transcribed.
+                select Table 'transLogBasename$'
+                Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
+                # Save the Nonword Transcription Log.
+                Save as tab-separated file... 'transLogFilepath$'
+              else
+                # If the transcriber (accidentally) hit the blank button
+                # (i.e., the left-most button) during the prosody-transcription
+                # phase, then print a message letting them know that they
+                # need to clear all of their Praat objects and rerun the
+                # script.
+                printline Error during Prosody Transcription:
+                printline   Clicking the blank button during the Prosody Transcription phase
+                printline   causes a fatal script error.
+                printline   Clear all of the objects from the Praat Object list, and then
+                printline   rerun the script if you would like to continue transcribing.
+                printline
+                trial = nTrialsCV + 1
+              endif
+            else
+              # If the transcriber (accidentally) hit the blank button
+              # (i.e., the left-most button) during the vowel-transcription
+              # phase, then print a message letting them know that they
+              # need to clear all of their Praat objects and rerun the
+              # script.
+              printline Error during Vowel Transcription:
+              printline   Clicking the blank button during the Vowel Transcription phase
               printline   causes a fatal script error.
               printline   Clear all of the objects from the Praat Object list, and then
               printline   rerun the script if you would like to continue transcribing.
               printline
               trial = nTrialsCV + 1
             endif
-          else
-            # If the transcriber (accidentally) hit the blank button
-            # (i.e., the left-most button) during the vowel-transcription
-            # phase, then print a message letting them know that they
-            # need to clear all of their Praat objects and rerun the
-            # script.
-            printline Error during Vowel Transcription:
-            printline   Clicking the blank button during the Vowel Transcription phase
-            printline   causes a fatal script error.
-            printline   Clear all of the objects from the Praat Object list, and then
-            printline   rerun the script if you would like to continue transcribing.
-            printline
-            trial = nTrialsCV + 1
           endif
         else
           # If the transcriber decided to quit, then set the 'trial'
