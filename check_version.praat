@@ -3,8 +3,8 @@ min_version$ = "5.3.64"
 
 # Check that the user has an appropriate version of Praat
 procedure check_min_version(.min_version$)
-  # Break apart version numbers
-  @chomp(praatVersion$, ".")
+	# Break apart version numbers
+	@chomp(praatVersion$, ".")
 	.major = number(chomp.bite$)
 
 	@chomp(chomp.leftover$, ".")
@@ -22,7 +22,7 @@ procedure check_min_version(.min_version$)
 	@chomp(chomp.leftover$, ".")
 	.min_final = number(chomp.bite$)
 
-  # Compare the digits in the two version numbers
+	# Compare the digits in the two version numbers
 	pass1 = .min_major < .major
 	pass2 = .min_major == .major and .min_minor < .minor
 	pass3 = .min_major == .major and .min_minor == .minor and .min_final < .final	
