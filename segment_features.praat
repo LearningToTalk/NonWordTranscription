@@ -5,6 +5,7 @@ fricative$ = "Fricative"
 nasal$     = "Nasal"
 glide$     = "Glide"
 omitted$   = "Omitted"
+approximant$ = "Approximant"
 manner_p$        = stop$
 manner_b$        = stop$
 manner_t$        = stop$
@@ -49,6 +50,7 @@ manner_n$        = nasal$
 manner_N$        = nasal$
 manner_j$        = glide$
 manner_w$        = glide$
+manner_l$        = approximant$
 
 # Place feature values for the consonants.
 bilabial$     = "Bilabial"
@@ -108,6 +110,7 @@ place_n$        = alveolar$
 place_N$        = velar$
 place_j$        = palatal$
 place_w$        = labiovelar$
+place_l$        = alveolar$
 
 # Voicing feature values for the consonants.
 voiced$    = "Voiced"
@@ -156,6 +159,7 @@ voicing_n$        = voiced$
 voicing_N$        = voiced$
 voicing_j$        = voiced$
 voicing_w$        = voiced$
+voicing_l$        = voiced$
 
 # Height feature values for the target vowels.
 high$      = "High"
