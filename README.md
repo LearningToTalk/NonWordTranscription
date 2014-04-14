@@ -10,4 +10,4 @@ To do:
 
 ### References
 
-Edwards, J. R., Beckman M. E., & Munson B. (2004). **[The interaction between vocabulary size and phonotactic probability effects on children's production accuracy and fluency in nonword repetition](http://www.ncbi.nlm.nih.gov/pubmed?term=15157141).** _Journal of Speech, Language, and Hearing Research_. _47_(2), 421--436.
+Edwards, J. R., Beckman M. E., & Munson B. (2004). **[The interaction between vocabulary size and phonotactic probability effects on children's production accuracy and fluency in nonword repetition](http://www.ncbi.nlm.nih.gov/pubmed?term=15157141).** _Journal of Speech, Language, and Hearing Research_. _47_(2), 421-436.
