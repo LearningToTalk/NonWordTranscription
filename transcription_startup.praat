@@ -52,7 +52,7 @@ while startup_node$ != startup_node_quit$ and startup_node$ != startup_node_tran
 		audio_drive$ = startup_initials.audio_drive$
 		task$ = startup_nwr_testwave.task$
 		testwave$ = startup_nwr_testwave.testwave$
-		transcribersInitials$ = startup_initials.initials$
+		initials$ = startup_initials.initials$
 		
 		@transcription_filepaths(drive$, audio_drive$, task$, testwave$)
 		@log_transcription_filepaths()
@@ -83,9 +83,8 @@ while startup_node$ != startup_node_quit$ and startup_node$ != startup_node_tran
 	elsif startup_node$ == startup_node_wordlist$
 		audio_sound$ = startup_load_audio.audio_sound$
 		experimental_ID$ = startup_load_audio.experimental_ID$
-		@startup_wordlist(task$, experimental_ID$, drive$, wordList_dir$)
-		@log_startup_wordlist()
-		
+		@startup_nwr_wordlist(task$, experimental_ID$, drive$, wordList_dir$)
+
 		@next_back_quit(startup_wordlist.result_node$, startup_node_segdata$, "", startup_node_quit$)
 		startup_node$ = next_back_quit.result$
 	
