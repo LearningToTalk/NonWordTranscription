@@ -178,8 +178,7 @@ while current_type < current_type_limit
 		trans_node_t1_score$ = "t1_score"
 		trans_node_t2$ = "t2"
 		trans_node_t2_score$ = "t2_score"
-		trans_node_prosody_organization$ = "prosody_organization"
-		trans_node_prosody_span$ = "prosody_span"
+		trans_node_prosody$ = "prosody"
 		trans_node_prosody_score$ = "prosody_score"
 		trans_node_save$ = "save"
 		trans_node_next_trial$ = "next_trial"
@@ -256,45 +255,23 @@ while current_type < current_type_limit
 				@selectTextGrid(transBasename$)
 				segmentInterval = Get interval at time: nwr_trans_textgrid.target2_seg, segmentXMid
 				Set interval text: nwr_trans_textgrid.target2_seg, segmentInterval, transcribe_segment.transcription$
-				trans_node$ = trans_node_prosody_organization$
+				trans_node$ = trans_node_prosody$
 			endif
 
-			# [PROSODIC ORGANIZATION]
-			if trans_node$ == trans_node_prosody_organization$
-				@transcribe_prosody_organization(trialNumber$, targetNonword$, target1$, target2$)
+			# [TRANSCRIBE PROSODY]
+			if trans_node$ == trans_node_prosody$
+				@transcribe_prosody(trialNumber$, targetNonword$, target1$, target2$)
 
-				@next_back_quit(transcribe_prosody_organization.result_node$, trans_node_prosody_span$, "", trans_node_quit$)
+				@next_back_quit(transcribe_prosody.result_node$, trans_node_prosody_score$, "", trans_node_quit$)
 				trans_node$ = next_back_quit.result$
-			endif
-
-			# [SYLLABLE SPAN]
-			if trans_node$ == trans_node_prosody_span$
-				# If the sequence is not prosodically organized correctly,
-				# prompt for syllable span information.
-				if transcribe_prosody_organization.organization != 1
-					@transcribe_prosody_span(trialNumber$, targetNonword$, target1$, target2$)
-
-					# If a score was obtained, make it available for next node.
-					if transcribe_prosody_span.result_node$ == node_next$
-						prosody_score = transcribe_prosody_span.span
-					endif
-
-					@next_back_quit(transcribe_prosody_span.result_node$, trans_node_prosody_score$ trans_node_prosody_organization, trans_node_quit$)
-					trans_node$ = next_back_quit.result$
-				# Otherwise, give a score of 2 for correct prosodic organization
-				else
-					prosody_score = 2
-					trans_node$ = trans_node_prosody_score$
-				endif
 			endif
 
 			# [PROSODY SCORE]
 			if trans_node$ == trans_node_prosody_score$
-				# 2: Correct organization
-				# 1: Incorrect organization, but at least correct syllable span
-				#    --e.g., an emergent production of a fricative.
-				# 0: Not even a correct syllable span
-				prosodyTranscription$ = "'prosody_score'"
+				# 2 points possible
+				# -1 for deleting a segment
+				# -1 for inserting a segment
+				prosodyTranscription$ = transcribe_prosody.transcription$
                 @selectTextGrid(transBasename$)
                 prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
                 Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
@@ -521,48 +498,53 @@ endproc
 
 
 
+
+
 # Prompt the transcriber to transcribe the target CV prosodically.
-procedure transcribe_prosody_organization(.trial_number$, .word$, .target1$, .target2$)
+procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 	beginPause("Prosodic Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
 
-		comment("Is the target sequence prosodically organized correctly?")
-		optionMenu("Prosodic organization", 1)
-		option("Yes")
-		option("No")
+		comment("Were any segments in the sequence deleted?")
+		boolean("One or both of the segments were deleted", 0)
+		
+		comment("Were any extra segments inserted into or next to the target sequence?")
+		boolean("An extra consonant was added", 0)
+		boolean("An extra vowel was added", 0)
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
 		.result_node$ = node_quit$
 	else
-		.organization = prosodic_organization
+		.deletion = one_or_both_of_the_segments_were_deleted
+		.cons_added = an_extra_consonant_was_added
+		.vowel_added = an_extra_vowel_was_added
+		.insertion = .cons_added or .vowel_added
+		
+		.score = 2 - (.insertion + .deletion)
+		
+		# Make text for three-part transcription: [deletion];[insertion];[score]
+		if .deletion
+			.prosody1$ = "segment_deleted"
+		else
+			.prosody1$ = "nothing_deleted"
+		endif
+				
+		if .cons_added and .vowel_added
+			.prosody2$ = "C_added,V_added"
+		elsif .cons_added 
+			.prosody2$ = "C_added"
+		elsif .vowel_added
+			.prosody2$ = "V_added"
+		else
+			.prosody2$ = "nothing_added"
+		endif
+		
+		.transcription$ = "'.prosody1$';'.prosody2$';'.score'"
+
 		.result_node$ = node_next$
 	endif
-
 endproc
-
-
-# If organization is not 1, check span
-procedure transcribe_prosody_span(.trial_number$, .word$, .target1$, .target2$)
-	beginPause("Prosodic Transcription")
-		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
-
-		comment("Does the target sequence span the correct number of syllables?")
-		optionMenu("Syllable span", 1)
-			option("Yes")
-			option("No")
-		button = endPause("Back", "Quit", "Transcribe it!", 3)
-
-		if button == 1
-			.result_node$ = node_back$
-		elsif button == 2
-			.result_node$ = node_quit$
-		else
-			.span = syllable_span
-			.result_node$ = node_next$
-		endif
-endproc
-
 
 
 
@@ -817,9 +799,6 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 		endif
 
 		# Use the '.key$' to look up the Place and Voicing features.
-		#consonantSymbol$ = .symbol$
-		#consonantPlace$ = place_'consonantKey$'$
-		#consonantVoicing$ = voicing_'consonantKey$'$
 		.place$ = place_'.key$'$
 		.voicing$ = voicing_'.key$'$
 		.result_node$ = node_next$
