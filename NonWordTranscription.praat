@@ -1,1050 +1,897 @@
-# Author: Patrick Reidy
-# Date: 10 August 2013
+# Controls whether the @log_[...] procedures write to the InfoLines.
+debug_mode = 1
+
+include check_version.praat
+include procs.praat
+include segment_features.praat
+include startup_procs.praat
+include transcription_startup.praat
 
 
 
 
-
-# Local filesystem constants.
-segmentDirectory$     = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/SegmentedTextGrids"
-audioDirectory$       = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/Audio"
-wordListDirectory$    = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/WordLists"
-transLogDirectory$      = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/NonwordTranscriptionLogs"
-transDirectory$  = "/media/bluelacy/patrick/Code/L2T-NonwordTranscription/Testing/NonwordTranscriptionTextGrids"
-
-# Manner feature values for the consonants.
-stop$      = "Stop"
-affricate$ = "Affricate"
-fricative$ = "Fricative"
-nasal$     = "Nasal"
-glide$     = "Glide"
-omitted$   = "Omitted"
-manner_p$        = stop$
-manner_b$        = stop$
-manner_t$        = stop$
-manner_d$        = stop$
-manner_tr$       = stop$
-manner_dr$       = stop$
-manner_tFlap$    = stop$
-manner_dFlap$    = stop$
-manner_c$        = stop$
-manner_J$        = stop$
-manner_k$        = stop$
-manner_g$        = stop$
-manner_q$        = stop$
-manner_Q$        = stop$
-manner_glotStop$ = stop$
-manner_ts$       = affricate$
-manner_dz$       = affricate$
-manner_tS$       = affricate$
-manner_dZ$       = affricate$
-manner_F$        = fricative$
-manner_V$        = fricative$
-manner_f$        = fricative$
-manner_v$        = fricative$
-manner_T$        = fricative$
-manner_D$        = fricative$
-manner_s$        = fricative$
-manner_z$        = fricative$
-manner_S$        = fricative$
-manner_Z$        = fricative$
-manner_C$        = fricative$
-manner_jV$       = fricative$
-manner_x$        = fricative$
-manner_G$        = fricative$
-manner_X$        = fricative$
-manner_K$        = fricative$
-manner_H$        = fricative$
-manner_exclaim$  = fricative$
-manner_h$        = fricative$
-manner_hv$       = fricative$
-manner_m$        = nasal$
-manner_n$        = nasal$
-manner_N$        = nasal$
-manner_j$        = glide$
-manner_w$        = glide$
-
-# Place feature values for the consonants.
-bilabial$     = "Bilabial"
-labiodental$  = "Labiodental"
-dental$       = "Dental"
-alveolar$     = "Alveolar"
-postalveolar$ = "Postalveolar"
-retroflex$    = "Retroflex"
-palatal$      = "Palatal"
-velar$        = "Velar"
-uvular$       = "Uvular"
-pharyngeal$   = "Pharyngeal"
-glottal$      = "Glottal"
-labiovelar$   = "Labiovelar"
-other$        = "Other"
-place_p$        = bilabial$
-place_b$        = bilabial$
-place_t$        = alveolar$
-place_d$        = alveolar$
-place_tr$       = retroflex$
-place_dr$       = retroflex$
-place_tFlap$    = alveolar$
-place_dFlap$    = alveolar$
-place_c$        = palatal$
-place_J$        = palatal$
-place_k$        = velar$
-place_g$        = velar$
-place_q$        = uvular$
-place_Q$        = uvular$
-place_glotStop$ = glottal$
-place_ts$       = alveolar$
-place_dz$       = alveolar$
-place_tS$       = postalveolar$
-place_dZ$       = postalveolar$
-place_F$        = bilabial$
-place_V$        = bilabial$
-place_f$        = labiodental$
-place_v$        = labiodental$
-place_T$        = dental$
-place_D$        = dental$
-place_s$        = alveolar$
-place_z$        = alveolar$
-place_S$        = postalveolar$
-place_Z$        = postalveolar$
-place_C$        = palatal$
-place_jV$       = palatal$
-place_x$        = velar$
-place_G$        = velar$
-place_X$        = uvular$
-place_K$        = uvular$
-place_H$        = pharyngeal$
-place_exclaim$  = pharyngeal$
-place_h$        = glottal$
-place_hv$       = glottal$
-place_m$        = bilabial$
-place_n$        = alveolar$
-place_N$        = velar$
-place_j$        = palatal$
-place_w$        = labiovelar$
-
-# Voicing feature values for the consonants.
-voiced$    = "Voiced"
-voiceless$ = "Voiceless"
-voicing_p$        = voiceless$
-voicing_b$        = voiced$
-voicing_t$        = voiceless$
-voicing_d$        = voiced$
-voicing_tr$       = voiceless$
-voicing_dr$       = voiced$
-voicing_tFlap$    = voiceless$
-voicing_dFlap$    = voiced$
-voicing_c$        = voiceless$
-voicing_J$        = voiced$
-voicing_k$        = voiceless$
-voicing_g$        = voiced$
-voicing_q$        = voiceless$
-voicing_Q$        = voiced$
-voicing_glotStop$ = voiceless$
-voicing_ts$       = voiceless$
-voicing_dz$       = voiced$
-voicing_tS$       = voiceless$
-voicing_dZ$       = voiced$
-voicing_F$        = voiceless$
-voicing_V$        = voiced$
-voicing_f$        = voiceless$
-voicing_v$        = voiced$
-voicing_T$        = voiceless$
-voicing_D$        = voiced$
-voicing_s$        = voiceless$
-voicing_z$        = voiced$
-voicing_S$        = voiceless$
-voicing_Z$        = voiced$
-voicing_C$        = voiceless$
-voicing_jV$       = voiced$
-voicing_x$        = voiceless$
-voicing_G$        = voiced$
-voicing_X$        = voiceless$
-voicing_K$        = voiced$
-voicing_H$        = voiceless$
-voicing_exclaim$  = voiced$
-voicing_h$        = voiceless$
-voicing_hv$       = voiced$
-voicing_m$        = voiced$
-voicing_n$        = voiced$
-voicing_N$        = voiced$
-voicing_j$        = voiced$
-voicing_w$        = voiced$
-
-# Height feature values for the target vowels.
-high$      = "High"
-mid$       = "Mid"
-low$       = "Low"
-xxxxxxx$   = "XXXXXXXXXX"
-height_ae$ = mid$
-height_aU$ = xxxxxxx$
-height_i$  = high$
-height_I$  = high$
-height_oi$ = xxxxxxx$
-height_u$  = high$
-height_U$  = high$
-height_V$  = mid$
-
-# Frontness feature values for the target vowels.
-front$        = "Front"
-central$      = "Central"
-back$         = "Back"
-frontness_ae$ = front$
-frontness_aU$ = xxxxxxx$
-frontness_i$  = front$
-frontness_I$  = front$
-frontness_oi$ = xxxxxxx$
-frontness_u$  = back$
-frontness_U$  = back$
-frontness_V$  = back$
-
-# Length feature values for the target vowels.
-tense$     = "Tense"
-lax$       = "Lax"
-diphthong$ = "Diphthong"
-length_ae$  = lax$
-length_aU$  = diphthong$
-length_i$   = tense$
-length_I$   = lax$
-length_oi$  = diphthong$
-length_u$   = tense$
-length_U$   = lax$
-length_V$   = lax$
-
-# Description of the Nonword Transcription Log.
-# A table with one row and the following columns (values).
-# - NonwordTranscriber (string): the initials of the nonword 
-#     transcriber.
-# - StartTime (string): the date & time that the transcription began.
-# - EndTime (string): the date & time that the transcription ended.
-# - NumberOfCVs (numeric): the number of trials (rows) in the Word
-#     List table whose target sequence is a CV.
-# - NumberOfCVsTranscribed (numeric): the number of CV-trials that
-#     have been transcribed.
-# - NumberOfVCs (numeric): the number of trials (rows) in the Word
-#     List table whose target sequence is a VC.
-# - NumberOfVCsTranscribed (numeric): the number of VC-trials that
-#     have been transcribed.
-# - NumberOfCCs (numeric): the number of trials (rows) in the Word
-#     List table whose target sequence is a CC.
-# - NumberOfCCsTranscribed (numeric): the number of CC-trails that
-#     have been transcribed.
-# Numeric and string constants for the NonwordTranscription Log.
-transLogTranscriber     = 1
-transLogTranscriber$    = "NonwordTranscriber"
-transLogStart           = 2
-transLogStart$          = "StartTime"
-transLogEnd             = 3
-transLogEnd$            = "EndTime"
-transLogCVs             = 4
-transLogCVs$            = "NumberOfCVs"
-transLogCVsTranscribed  = 5
-transLogCVsTranscribed$ = "NumberOfCVsTranscribed"
-transLogVCs             = 6
-transLogVCs$            = "NumberOfVCs"
-transLogVCsTranscribed  = 7
-transLogVCsTranscribed$ = "NumberOfVCsTranscribed"
-transLogCCs             = 8
-transLogCCs$            = "NumberOfCCs"
-transLogCCsTranscribed  = 9
-transLogCCsTranscribed$ = "NumberOfCCsTranscribed"
-
-# Description of the Nonword Transcription TextGrid.
-transTextGridTarget1Seg   = 1
-transTextGridTarget1Seg$  = "Target1Seg"
-transTextGridTarget2Seg   = 2
-transTextGridTarget2Seg$  = "Target2Pros"
-transTextGridProsody      = 3
-transTextGridProsody$     = "Prosody"
-
-# Numeric and string constants for the Segmented TextGrid.
-segTextGridTrial       = 1
-segTextGridTrial$      = "Trial"
-segTextGridWord        = 2
-segTextGridWord$       = "Word"
-segTextGridContext     = 3
-segTextGridContext$    = "Context"
-segTextGridRepetition  = 4
-segTextGridRepetition$ = "Repetition"
-segTextGridSegmNotes   = 5
-segTextGridSegmNotes$  = "SegmNotes"
 
 # Numeric and string constants for the Word List Table.
-wordListTrialNumber      = 1
-wordListTrialNumber$     = "TrialNumber"
-wordListTrialType        = 2
-wordListTrialType$       = "TrialType"
-wordListOrthography      = 3
-wordListOrthography$     = "Orthography"
-wordListWorldBet         = 4
-wordListWorldBet$        = "WorldBet"
-wordListFrame1           = 5
-wordListFrame1$          = "Frame1"
-wordListTarget1          = 6
-wordListTarget1$         = "Target1"
-wordListTarget2          = 7
-wordListTarget2$         = "Target2"
-wordListFrame2           = 8
-wordListFrame2$          = "Frame2"
-wordListTargetStructure  = 9
-wordListTargetStructure$ = "TargetStructure"
-wordListFrequency        = 10
-wordListFrequency$       = "Frequency"
-wordListComparisonPair   = 11
-wordListComparisonPair$  = "ComparisonPair"
+wordListBasename$ = startup_nwr_wordlist.table$
+wordListTrialNumber$ = startup_nwr_wordlist.trial_number$
+wordListWorldBet$ = startup_nwr_wordlist.worldbet$
+wordListTarget1$ = startup_nwr_wordlist.target1$
+wordListTarget2$ = startup_nwr_wordlist.target2$
+wordListTargetStructure$ = startup_nwr_wordlist.target_structure$
+
+# Column numbers from the segmented textgrid
+segTextGridTrial = startup_segm_textgrid.trial
+segTextGridContext = startup_segm_textgrid.context
 
 
 
-# Prompt the transcriber for her initials.
-beginPause ("Transcriber's initials")
-  comment ("Please enter your initials in the field below.")
-  word    ("Your initials", "")
-button = endPause ("Quit", "Continue", 2, 1)
-if button == 2
-  transcribersInitials$ = your_initials$
-endif
 
-# Prompt the transcriber to choose the subject's experimental ID.
-Create Strings as file list... segmentedTextGrids 'segmentDirectory$'/*segm.TextGrid
-select Strings segmentedTextGrids
-Sort
-beginPause ("Subject's experimental ID")
-  comment ("Choose the subject's experimental ID from the menu below.")
-  select Strings segmentedTextGrids
-  nTextGrids = Get number of strings
-  optionMenu ("Experimental ID", 1)
-  for nTextGrid to nTextGrids
-    segmentedFilename$ = Get string... nTextGrid
-    # 'segmentedFilename$' has the form:
-    #    "(RealWordRep|NonWordRep)_::ExperimentalID::_XXsegm.TextGrid"
-    # Parse the experimental ID from 'segmentedFilename$'.
-    experimentalID$ = extractWord$(segmentedFilename$, "_")
-    suffixPosition  = rindex(experimentalID$, "_")
-    experimentalID$ = left$(experimentalID$, suffixPosition - 1)
-    option ("'experimentalID$'")
-  endfor
-button = endPause ("Quit", "Continue", 2, 1)
-  experimentalID$ = experimental_ID$
-endif
+# Count the trials of structure type
+@count_nwr_wordlist_structures(wordListBasename$, wordListTargetStructure$)
+nTrialsCV = count_nwr_wordlist_structures.nTrialsCV
+nTrialsVC = count_nwr_wordlist_structures.nTrialsVC
+nTrialsCC = count_nwr_wordlist_structures.nTrialsCC
 
-# Read in the segmented TextGrid from the local filesystem.
-segmentExpID$ = ""
-nTextGrid     = 0
-while segmentExpID$ <> experimentalID$
-  # Iterate through the 'segmentedTextGrids' Strings list, parsing
-  # out the experimental ID from each filename and comparing it to
-  # the experimental ID chosen by the tagger above.
-  nTextGrid = nTextGrid + 1
-  select Strings segmentedTextGrids
-  segmentFilename$ = Get string... nTextGrid
-  segmentExpID$    = extractWord$(segmentFilename$, "_")
-  suffixPosition   = rindex(segmentExpID$, "_")
-  segmentExpID$    = left$(segmentExpID$, suffixPosition - 1)
-endwhile
-# Set the filepath and basename of the segmented TextGrid.
-segmentBasename$ = left$(segmentFilename$, length(segmentFilename$) - 9)
-segmentFilepath$ = "'segmentDirectory$'/'segmentFilename$'"
-# Read in the segmented TextGrid.
-Read from file... 'segmentFilepath$'
-# Create a Table from the segmented TextGrid.
-select TextGrid 'segmentBasename$'
-Down to Table... 0 6 1 0
-# Remove the 'segmentedTextGrids' Strings object from the Praat
-# objects list.
-select Strings segmentedTextGrids
-Remove
 
-# Read in the audio file from the local filesystem.
-# Create a Strings object from the list of .wav (and .WAV) files in
-# the audio directory, and sort it alpha-numerically.
-Create Strings as file list... audioFiles 'audioDirectory$'/*.wav
-if (macintosh or unix)
-  Create Strings as file list... audioFiles2 'audioDirectory$'/*.WAV
-  select Strings audioFiles
-  plus Strings audioFiles2
-  Append
-  select Strings audioFiles
-  plus Strings audioFiles2
-  Remove
-  select Strings appended
-  Rename... audioFiles
-endif
-select Strings audioFiles
-Sort
-nAudioFiles = Get number of strings
-# Iterate through the 'audioFiles' Strings list, parsing out the
-# experimental ID from each filename and comparing it to the 
-# experimental ID chosen by the tagger.
-audioExpID$ = ""
-nAudioFile  = 0
-while (audioExpID$ <> experimentalID$) & (nAudioFile <= nAudioFiles)
-  nAudioFile = nAudioFile + 1
-  select Strings audioFiles
-  audioFilename$ = Get string... nAudioFile
-  audioExpID$    = extractWord$(audioFilename$, "_")
-  audioExpID$    = left$(audioExpID$, length(audioExpID$) - 4)
-endwhile
-if nAudioFile <= nAudioFiles
-  # If the 'nAudioFile' variable is less than the 'nAudioFiles'
-  # constant, then an appropriately named audio file was found.
-  # Set the filepath and basename of the audio file.
-  audioBasename$ = left$(audioFilename$, length(audioFilename$) - 4)
-  audioFilepath$ = "'audioDirectory$'/'audioFilename$'"
-  # Read in the audio file.
-  Read from file... 'audioFilepath$'
+
+# Check that the log and textgrid exist already
+@nwr_trans_log("check", task$, experimental_ID$, initials$, transLogDirectory$, nTrialsCV, nTrialsVC, nTrialsCC)
+@nwr_trans_textgrid("check", task$, experimental_ID$, initials$, transDirectory$)
+
+# Load or initialize the transcription log/textgrid iff
+# the log/textgrid both exist already or both need to be created.
+if nwr_trans_log.exists == nwr_trans_textgrid.exists
+	@nwr_trans_log("load", task$, experimental_ID$, initials$, transLogDirectory$, nTrialsCV, nTrialsVC, nTrialsCC)
+	@nwr_trans_textgrid("load", task$, experimental_ID$, initials$, transDirectory$)
+# Otherwise exit with an error message
 else
-  # Otherwise, an appropriately named audio file was not found.
-  # Print a message to the Praat output window.
-  printline Error when loading the audio file:
-  printline   No audio file with experimental ID:
-  printline     'experimentalID$' 
-  printline   was found in the audio directory:
-  printline     'audioDirectory$'
-  printline
+	log_part$ = "Log " + nwr_trans_log.filename$
+	grid_part$ = "TextGrid " + nwr_trans_textgrid.filename$
+	if nwr_trans_log.exists
+		msg$ = "Initialization error: " + log_part$ + "was found, but " + grid_part$ + " was not."
+	else
+		msg$ = "Initialization error: " + grid_part$ + "was found, but " + log_part$ + " was not."
+	endif
+	exitScript: msg$
 endif
-# Remove the 'audioFiles' Strings object from the Praat objects list.
-select Strings audioFiles
-Remove
 
-# Read in the Word List table from the local filesystem.
-Create Strings as file list... wordLists 'wordListDirectory$'/*WordList.txt
-select Strings wordLists
-Sort
-nWordLists = Get number of strings
-wordListExpID$ = ""
-nWordList   = 0
-while (wordListExpID$ <> experimentalID$) & (nWordList <= nWordLists)
-  nWordList = nWordList + 1
-  select Strings wordLists
-  wordListFilename$ = Get string... nWordList
-  wordListExpID$ = extractWord$(wordListFilename$, "_")
-  suffixPosition = rindex(wordListExpID$, "_")
-  wordListExpID$ = left$(wordListExpID$, suffixPosition - 1)
-endwhile
-if nWordList <= nWordLists
-  # If the 'nWordList' variable is less than the 'nWordLists' constant,
-  # then an appropriately named Word List table was found.
-  # Set the filepath and basename of the Word List table.
-  wordListBasename$ = left$(wordListFilename$, length(wordListFilename$) - 4)
-  wordListFilepath$ = "'wordListDirectory$'/'wordListFilename$'"
-  # Read in the Word List table.
-  Read Table from tab-separated file... 'wordListFilepath$'
-  # Get the number of CV-trials in the Word List table.
-  select Table 'wordListBasename$'
-  Extract rows where column (text)... 'wordListTargetStructure$' "is equal to" CV
-  select Table 'wordListBasename$'_CV
-  nTrialsCV = Get number of rows
-  # Get the number of VC-trials in the Word List table.
-  select Table 'wordListBasename$'
-  Extract rows where column (text)... 'wordListTargetStructure$' "is equal to" VC
-  select Table 'wordListBasename$'_VC
-  nTrialsVC = Get number of rows
-  # Get the number of CC-trials in the Word List table.
-  select Table 'wordListBasename$'
-  Extract rows where column (text)... 'wordListTargetStructure$' "is equal to" CC
-  select Table 'wordListBasename$'_CC
-  nTrialsCC = Get number of rows
-else
-  # Otherwise, an appropriately named Word List table was not found.
-  # Print a message to the Praat output window.
-  printline Error when loading the Word List table:
-  printline   No Word List table with experimental ID:
-  printline    'experimentalID$' 
-  printline   was found in the Word List directory:
-  printline     'wordListDirectory$'
-  printline
-endif
-select Strings wordLists
-Remove
 
-# Look for a Nonword Transcription Log and a Nonword Transcription
-# TextGrid on the local filesystem.
-# Declare the string constants for the locations of the Nonword 
-# Transcription Log and the Nonword Transcription TextGrid.
-transLogBasename$ = "'audioBasename$'_'transcribersInitials$'transLog"
-transLogFilename$ = "'transLogBasename$'.txt"
-transLogFilepath$ = "'transLogDirectory$'/'transLogFilename$'"
-transBasename$    = "'audioBasename$'_'transcribersInitials$'trans"
-transFilename$    = "'transBasename$'.TextGrid"
-transFilepath$    = "'transDirectory$'/'transFilename$'"
-# Check if the 'transLogFilepath$' points to a readable file on the
-# local filesystem.
-transLogExists = fileReadable(transLogFilepath$)
-if transLogExists
-  # If an appropriately named Nonword Transcription Log exists on the
-  # filesystem.
-  Read Table from tab-separated file... 'transLogFilepath$'
-  # Since a Nonword Transcription Log exists, a Nonword Transcription
-  # TextGrid should also exist on the local filesystem.
-  transTextGridExists = fileReadable(transFilepath$)
-  if transTextGridExists
-    # If a Nonword Transcription TextGrid is found on the filesystem,
-    # read it into Praat.
-    Read from file... 'transFilepath$'
-  else
-    # If a Nonword Transcription TextGrid is not found on the filesystem,
-    # print an error message to the Praat Info window.
-    printline Error when loading the Nonword Transcription TextGrid:
-    printline   No Nonword Transcription TextGrid with filename:
-    printline     'transFilename$'
-    printline   was found in the Nonword Transcription TextGrid directory:
-    printline     'transDirectory$'
-    printline
-  endif
-else
-  # Otherwise create a Nonword Transcription Log.
-  Create Table with column names... 'transLogBasename$' 1 'transLogTranscriber$' 'transLogStart$' 'transLogEnd$' 'transLogCVs$' 'transLogCVsTranscribed$' 'transLogVCs$' 'transLogVCsTranscribed$' 'transLogCCs$' 'transLogCCsTranscribed$'
-  # Initialize the values of the Nonword Transcription Log.
-  currentTime$ = replace$(date$(), " ", "_", 0)
-  select Table 'transLogBasename$'
-  Set string value... 1 'transLogTranscriber$' 'transcribersInitials$'
-  Set string value... 1 'transLogStart$' 'currentTime$'
-  Set string value... 1 'transLogEnd$' 'currentTime$'
-  Set numeric value... 1 'transLogCVs$' 'nTrialsCV'
-  Set numeric value... 1 'transLogCVsTranscribed$' 0
-  Set numeric value... 1 'transLogVCs$' 'nTrialsVC'
-  Set numeric value... 1 'transLogVCsTranscribed$' 0
-  Set numeric value... 1 'transLogCCs$' 'nTrialsCC'
-  Set numeric value... 1 'transLogCCsTranscribed$' 0
-  # And create a Nonword Transcription TextGrid.
-  select Sound 'audioBasename$'
-  To TextGrid... "'transTextGridTarget1Seg$' 'transTextGridTarget2Seg$' 'transTextGridProsody$'"
-  select TextGrid 'audioBasename$'
-  Rename... 'transBasename$'
-endif
+
+
+# Export values to global namespace
+segmentBasename$ = startup_segm_textgrid.basename$
+audioBasename$ = startup_load_audio.audio_sound$
+transBasename$ = nwr_trans_textgrid.basename$
+transLogBasename$ = nwr_trans_log.basename$
+
+# These are column names
+transLogCVs$ = nwr_trans_log.cvs$
+transLogCVsTranscribed$ = nwr_trans_log.cvs_transcribed$
+transLogVCs$ = nwr_trans_log.vcs$
+transLogVCsTranscribed$ = nwr_trans_log.vcs_transcribed$
+transLogCCs$ = nwr_trans_log.ccs$
+transLogCCsTranscribed$ = nwr_trans_log.ccs_transcribed$
+
+
+
 
 # Open an Editor window.
-select TextGrid 'transBasename$'
-plus Sound 'audioBasename$'
+@selectTextGrid(transBasename$)
+plusObject("Sound " + audioBasename$)
 Edit
 # Set the Spectrogram settings, etc., here.
 
-# Check if there are any CV trials to transcribe.
-select Table 'transLogBasename$'
-nTrialsCV = Get value... 1 'transLogCVs$'
-nTrialsTranscribedCV = Get value... 1 'transLogCVsTranscribed$'
-nTrialsLeftCV = nTrialsCV - nTrialsTranscribedCV
-if nTrialsTranscribedCV < nTrialsCV
-  # If there are still CV trials to transcribe, ask the transcriber
-  # if she would like to transcribe them.
-  beginPause ("Transcribe CV-trials")
-    comment ("There are 'nTrialsLeftCV' CV-trials to transcribe.")
-    comment ("Would you like to transcribe them?")
-  button = endPause ("No", "Yes", 2, 1)
-  if button == 2
-    # If the transcriber decided to transcribe the remaining CV-trials
-    # Determine the trial (i.e., the row of the CV-Word List table)
-    # to start at.
-    trial = nTrialsTranscribedCV + 1
-    # Loop through the trials (i.e., the rows of the CV-Word List table)
-    while trial <= nTrialsCV
-      # Get the Trial Number of the current CV-trial.
-      select Table 'wordListBasename$'_CV
-      trialNumber$ = Get value... 'trial' 'wordListTrialNumber$'
-      # Use the 'trialNumber$' to determine, from the segmented TextGrid,
-      # the XMin and XMax of the current trial.
-      select Table 'segmentBasename$'
-      segTableRow = Search column... text 'trialNumber$'
-      trialXMin   = Get value... 'segTableRow' tmin
-      trialXMax   = Get value... 'segTableRow' tmax
-      trialXMid   = (trialXMin + trialXMax) / 2
-      select TextGrid 'segmentBasename$'
-      trialInterval = Get interval at time... 'segTextGridTrial' 'trialXMid'
-      trialXMin     = Get start point... 'segTextGridTrial' 'trialInterval'
-      trialXMax     = Get end point... 'segTextGridTrial' 'trialInterval'
-      # Use the XMin and XMax of the current trial to extract that 
-      # portion of the segmented TextGrid.  The TextGrid that this
-      # operation creates will have the name:
-      # ::ExperimentalTask::_::ExperimentalID::_::SegmentersInitials::segm_part
-      select TextGrid 'segmentBasename$'
-      Extract part... 'trialXMin' 'trialXMax' 1
-      # Convert the (extracted) TextGrid to a Table, which has the
-      # same name as the TextGrid from which it was created.
-      select TextGrid 'segmentBasename$'_part
-      Down to Table... 0 6 1 0
-      # Remove the extracted TextGrid
-      select TextGrid 'segmentBasename$'_part
-      Remove
-      # Subset the 'segmentBasename$'_part Table to just the intervals 
-      # on the Context Tier.
-      select Table 'segmentBasename$'_part
-      Extract rows where column (text)... tier "is equal to" Context
-      # Remove the 'segmentBasename$'_part Table.
-      select Table 'segmentBasename$'_part
-      Remove
-      # Get the Context label of the first segmented interval of this
-      # trial.
-      select Table 'segmentBasename$'_part_Context
-      contextLabel$ = Get value... 1 text
-      # Check that the segmentation was an actual response.
-      if contextLabel$ <> "NonResponse"
-        # If the segmentation wasn't a NonResponse, then it needs to
-        # be transcribed.
-        # Determine the XMin and XMax of the segmented interval.
-        select Table 'segmentBasename$'_part_Context
-        segmentXMin = Get value... 1 tmin
-        segmentXMax = Get value... 1 tmax
-        segmentXMid = (segmentXMin + segmentXMax) / 2
-        select TextGrid 'segmentBasename$'
-        segmentInterval = Get interval at time... 'segTextGridContext' 'segmentXMid'
-        segmentXMin     = Get start point... 'segTextGridContext' 'segmentInterval'
-        segmentXMax     = Get end point... 'segTextGridContext' 'segmentInterval'
-        segmentXMid     = (segmentXMin + segmentXMax) / 2
-        # Add interval boundaries on each tier.
-        select TextGrid 'transBasename$'
-        Insert boundary... 'transTextGridTarget1Seg' 'segmentXMin'
-        Insert boundary... 'transTextGridTarget1Seg' 'segmentXMax'
-        Insert boundary... 'transTextGridTarget2Seg' 'segmentXMin'
-        Insert boundary... 'transTextGridTarget2Seg' 'segmentXMax'
-        Insert boundary... 'transTextGridProsody' 'segmentXMin'
-        Insert boundary... 'transTextGridProsody' 'segmentXMax'
-        # Zoom to the segmented interval in the editor window.
-        editor TextGrid 'transBasename$'
-          zoomXMin = segmentXMin - 0.25
-          zoomXMax = segmentXMax + 0.25
-          Zoom... zoomXMin zoomXMax
-        endeditor
-        # Information to display to the tagger.
-        # - Trial Number
-        # - Target Word (WorldBet transcription)
-        # - Target Consonant (WorldBet transcription)
-        # - Target Vowel (WorldBet transcription)
-        select Table 'wordListBasename$'_CV
-        targetNonword$   = Get value... 'trial' 'wordListWorldBet$'
-        targetConsonant$ = Get value... 'trial' 'wordListTarget1$'
-        targetVowel$     = Get value... 'trial' 'wordListTarget2$'
-        # Prompt the transcriber to the select the consonant's manner feature.
-        ######## begin edit #####################
-        beginPause ("Consonant Transcription")
-          comment ("Trial number: 'trialNumber$'")
-          comment ("Target nonword: 'targetNonword$'")
-          comment ("Target consonant: 'targetConsonant$'")
-          comment ("Target vowel: 'targetVowel$'")
-          optionMenu ("Consonant manner", 1)
-            option (stop$)
-            option (affricate$)
-            option (fricative$)
-            option (nasal$)
-            option (glide$)
-            option (omitted$)
-        button = endPause ("Quit", "Transcribe it!", 2, 1)
-        # Check whether the transcriber decided to transcribe the consonant or quit.
-        if button == 2
-          # If the transcriber chose to transcribe the consonant, then
-          # check the value of the 'consonant_manner$' feature.
-          if consonant_manner$ <> omitted$
-            # If the consonant was not omitted, then prompt the transcriber
-            # to select the consonant's transcription from a list of
-            # WorldBet symbols.
-            consonantManner$ = consonant_manner$
-            beginPause ("Consonant Transcription")
-              comment ("Trial number: 'trialNumber$'")
-              comment ("Target nonword: 'targetNonword$'")
-              comment ("Target consonant: 'targetConsonant$'")
-              comment ("Target vowel: 'targetVowel$'")
-              optionMenu ("Consonant transcription", 1)
-                if consonantManner$ == stop$
-                  option ("p")
-                  option ("b")
-                  option ("t")
-                  option ("d")
-                  option ("tr")
-                  option ("dr")
-                  option ("t(")
-                  option ("d(")
-                  option ("c")
-                  option ("J")
-                  option ("k")
-                  option ("g")
-                  option ("q")
-                  option ("Q")
-                  option ("?")
-                  option (other$)
-                elsif consonantManner$ == affricate$
-                  option ("ts")
-                  option ("dz")
-                  option ("tS")
-                  option ("dZ")
-                  option (other$)
-                elsif consonantManner$ == fricative$
-                  option ("F")
-                  option ("V")
-                  option ("f")
-                  option ("v")
-                  option ("T")
-                  option ("D")
-                  option ("s")
-                  option ("z")
-                  option ("S")
-                  option ("Z")
-                  option ("C")
-                  option ("j^")
-                  option ("x")
-                  option ("G")
-                  option ("X")
-                  option ("K")
-                  option ("H")
-                  option ("!")
-                  option ("h")
-                  option ("hv")
-                  option (other$)
-                elsif consonantManner$ == nasal$
-                  option ("m")
-                  option ("n")
-                  option ("N")
-                  option (other$)
-                elsif consonantManner$ == glide$
-                  option ("j")
-                  option ("w")
-                  option (other$)
-                endif
-            button = endPause ("", "Transcribe it!", 2, 1)
-            # Check which button the transcriber clicked.
-            if button == 2
-              # Check whether the transcriber selected a WorldBet symbol.
-              if consonant_transcription$ <> "Other"
-                # If the transcriber selected a WorldBet symbol, then
-                # parse its features.
-                # Translate the 'consonant_transcription$' to a character
-                # key that can be used to look up the Place and Voicing
-                # features.
-                if consonant_transcription$ == "t("
-                  consonantKey$ = "tFlap"
-                elsif consonant_transcription$ == "d("
-                  consonantKey$ = "dFlap"
-                elsif consonant_transcription$ == "?"
-                  consonantKey$ = "glotStop"
-                elsif consonant_transcription$ == "j^"
-                  consonantKey$ = "jV"
-                elsif consonant_transcription$ == "!"
-                  consonantKey$ = "exclaim"
-                else
-                  consonantKey$ = consonant_transcription$
-                endif
-                # Use the 'consonantKey$' to look up the Place and
-                # Voicing features.
-                consonantSymbol$ = consonant_transcription$
-                consonantPlace$ = place_'consonantKey$'$
-                consonantVoicing$ = voicing_'consonantKey$'$
-                # Set the switch to transcribe the vowel.
-                transcribeVowel = 1
-              else
-                # If the transcriber did not select a WorldBet symbol,
-                # then prompt her to select the Place and Voicing features
-                # from drop-down menus.
-                beginPause ("Consonant Transcription")
-                  comment ("Trial number: 'trialNumber$'")
-                  comment ("Target nonword: 'targetNonword$'")
-                  comment ("Target consonant: 'targetConsonant$'")
-                  comment ("Target vowel: 'targetVowel$'")
-                  optionMenu ("Consonant place", 1)
-                    option (bilabial$)
-                    option (labiodental$)
-                    option (labiovelar$)
-                    option (dental$)
-                    option (alveolar$)
-                    option (postalveolar$)
-                    option (retroflex$)
-                    option (palatal$)
-                    option (velar$)
-                    option (uvular$)
-                    option (pharyngeal$)
-                    option (glottal$)
-                  optionMenu ("Consonant voicing", 1)
-                    option (voiced$)
-                    option (voiceless$)
-                button = endPause ("", "Transcribe it!", 2, 1)
-                if button == 2
-                  # Use the transcriber's selections to set the 
-                  # Place and Voicing features of the consonant.
-                  consonantSymbol$ = ""
-                  consonantPlace$ = consonant_place$
-                  consonantVoicing$ = consonant_voicing$
-                  # Set the switch to transcribe the vowel.
-                  transcribeVowel = 1
-                else
-                  # If the transcriber (accidentally) hit the blank button
-                  # (i.e., the left-most button) during the vowel-transcription
-                  # phase, then print a message letting them know that they
-                  # need to clear all of their Praat objects and rerun the
-                  # script.
-                  printline Error during Vowel Transcription:
-                  printline   Clicking the blank button during the Consonant Transcription phase
-                  printline   causes a fatal script error.
-                  printline   Clear all of the objects from the Praat Object list, and then
-                  printline   rerun the script if you would like to continue transcribing.
-                  printline
-                  trial = nTrialsCV + 1
-                  # Set the switch not to transcribe the vowel.
-                  transcribeVowel = 0
-                endif
-              endif
-            else 
-              # If the transcriber (accidentally) hit the blank button
-              # (i.e., the left-most button) during the vowel-transcription
-              # phase, then print a message letting them know that they
-              # need to clear all of their Praat objects and rerun the
-              # script.
-              printline Error during Vowel Transcription:
-              printline   Clicking the blank button during the Consonant Transcription phase
-              printline   causes a fatal script error.
-              printline   Clear all of the objects from the Praat Object list, and then
-              printline   rerun the script if you would like to continue transcribing.
-              printline
-              trial = nTrialsCV + 1
-              # Set the switch not to transcribe the vowel.
-              transcribeVowel = 0
-            endif
-          else
-            # If the consonant was omitted (i.e., not produced in the
-            # attempted repetition of the target word), then ...
-            # ... the consonant symbol is Omitted.
-            consonantSymbol$ = omitted$
-            # ... each of the consonant's features is Omitted.
-            consonantManner$   = omitted$
-            consonantPlace$    = omitted$
-            consonantVoicing$  = omitted$
-            # Set the switch to transcribe the vowel.
-            transcribeVowel = 1
-          endif
-          # Decisions made up to this point:
-          # 1. Transcribe the consonant, but the blank button may
-          #    have been pressed during the Consonant Transcription
-          #    phase, which will ruin everything below.
-          #    Relevant variable: transcribeVowel
-          # 2. If transcribeVowel == 1, then the consonant has been
-          #    transcribed for its Manner, Place, and Voicing features.
-          if transcribeVowel == 1
-            # If the vowel is to be transcribed, then the consonant's
-            # feature values have been determined, which means that its
-            # segmental score and its transcription can be determined
-            # and entered into the TextGrid.
-            # Compute the consonant's segmental score.
-            consonantScore = 0
-            if manner_'targetConsonant$'$ == consonantManner$
-              consonantScore = consonantScore + 1
-            endif
-            if place_'targetConsonant$'$ == consonantPlace$
-              consonantScore = consonantScore + 1
-            endif
-            if voicing_'targetConsonant$'$ == consonantVoicing$
-              consonantScore = consonantScore + 1
-            endif
-            # Determine the consonant's transcription.
-            consonantTranscription$ = "'consonantSymbol$';'consonantManner$','consonantPlace$','consonantVoicing$';'consonantScore'"
-            # Add the 'consonantTranscription$' to the TextGrid
-            select TextGrid 'transBasename$'
-            consonantSegInterval = Get interval at time... 'transTextGridTarget1Seg' 'segmentXMid'
-            Set interval text... 'transTextGridTarget1Seg' 'consonantSegInterval' 'consonantTranscription$'
-        ########  end edit  #####################
-#        beginPause ("Consonant Transcription")
-#          comment ("Trial number: 'trialNumber$'")
-#          comment ("Target nonword: 'targetNonword$'")
-#          comment ("Target consonant: 'targetConsonant$'")
-#          comment ("Target vowel: 'targetVowel$'")
-#          optionMenu ("Consonant manner", 1)
-#            option (stop$)
-#            option (affricate$)
-#            option (fricative$)
-#            option (nasal$)
-#            option (glide$)
-#            option (omitted$)
-#          optionMenu ("Consonant place", 1)
-#            option (bilabial$)
-#            option (alveolar$)
-#            option (labiodental$)
-#            option (velar$)
-#            option (palatal$)
-#            option (labiovelar$)
-#          optionMenu ("Consonant voicing", 1)
-#            option (voiced$)
-#            option (voiceless$)
-#        button = endPause ("Quit", "Transcribe it!", 2, 1)
-#        # Check whether the transcriber decided to transcribe the consonant or quit.
-#        if button == 2
-#          # If the transcriber chose to transcribe the consonant...
-#          # Concatenate the consonant's manner, place, and voicing
-#          # feature values into a string that determines its transcription.
-#          consonantFeatures$ = "'consonant_manner$', 'consonant_place$', 'consonant_voicing$'"
-#          consonantTranscription$ = consonantFeatures$
-#          select TextGrid 'transBasename$'
-#          consonantSegInterval = Get interval at time... 'transTextGridTarget1Seg' 'segmentXMid'
-#          Set interval text... 'transTextGridTarget1Seg' 'consonantSegInterval' 'consonantTranscription$'
-            # Prompt the transcriber to select the vowel's feature values.
-            beginPause ("Vowel Transcription")
-              comment ("Trial number: 'trialNumber$'")
-              comment ("Target nonword: 'targetNonword$'")
-              comment ("Target consonant: 'targetConsonant$'")
-              comment ("Target vowel: 'targetVowel$'")
-              optionMenu ("Vowel height", 1)
-                option (high$)
-                option (mid$)
-                option (low$)
-              optionMenu ("Vowel frontness", 1)
-                option (front$)
-                option (central$)
-                option (back$)
-              optionMenu ("Vowel length", 1)
-                option (tense$)
-                option (lax$)
-                option (diphthong$)
-            button = endPause ("", "Transcribe it!", 2, 1)
-            if button == 2
-              # Compute the vowel's segmental score.
-              vowelScore = 0
-              if height_'targetVowel$'$ == vowel_height$
-                vowelScore = vowelScore + 1
-              endif
-              if frontness_'targetVowel$'$ == vowel_frontness$
-                vowelScore = vowelScore + 1
-              endif
-              if length_'targetVowel$'$ == vowel_length$
-                vowelScore = vowelScore + 1
-              endif
-              # Concatenate the vowel's height, frontness, and length
-              # feature values into a string that determines its transcription.
-              #vowelFeatures$ = "'vowel_height$', 'vowel_frontness$', 'vowel_length$'"
-              # Add the vowel transcription to the TextGrid.
-              #vowelTranscription$ = "'vowelScore'"
-              vowelTranscription$ = "'vowel_height$','vowel_frontness$','vowel_length$';'vowelScore'"
-              select TextGrid 'transBasename$'
-              vowelSegInterval = Get interval at time... 'transTextGridTarget2Seg' 'segmentXMid'
-              Set interval text... 'transTextGridTarget2Seg' 'vowelSegInterval' 'vowelTranscription$'
-              # Prompt the transcriber to transcribe the target CV prosodically.
-              beginPause ("Prosodic Transcription")
-                comment ("Trial number: 'trialNumber$'")
-                comment ("Target nonword: 'targetNonword$'")
-                comment ("Target consonant: 'targetConsonant$'")
-                comment ("Target vowel: 'targetVowel$'")
-                comment ("Is the target sequence prosodically organized correctly?")
-                optionMenu ("Prosodic organization", 1)
-                  option ("Yes")
-                  option ("No")
-              button = endPause ("", "Transcribe it!", 2, 1)
-              if button == 2
-                # Use the value of 'prosodic_transcription' to determine
-                # whether the transcriber must judge the number of syllables
-                # spanned by the target sequence.
-                if prosodic_organization <> 1
-                  beginPause ("Prosodic Transcription")
-                    comment ("Trial number: 'trialNumber$'")
-                    comment ("Target nonword: 'targetNonword$'")
-                    comment ("Target consonant: 'targetConsonant$'")
-                    comment ("Target vowel: 'targetVowel$'")
-                    comment ("Does the target sequence span the correct number of syllables?")
-                    optionMenu ("Syllable span", 1)
-                      option ("Yes")
-                      option ("No")
-                  button = endPause ("", "Transcribe it!", 2, 1)
-                  if button == 2
-                    # Use the value of 'syllable_span' to determine the score
-                    # for the prosodic transcription.
-                    if syllable_span <> 1
-                      # The target sequence was neither prosodically organized 
-                      # correctly, nor did it span the correct number of syllables.
-                      prosodyScore = 0
-                    else
-                      # The target sequence was not prosodically organized
-                      # correctly, but it did span the correct number of 
-                      # syllables---e.g., an emergent production of a fricative.
-                      prosodyScore = 1
-                    endif
-                    # Add the 'prosodyScore' transcription to the Nonword
-                    # Transcription TextGrid.
-                    prosodyTranscription$ = "'prosodyScore'"
-                    select TextGrid 'transBasename$'
-                    prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
-                    Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
-                    # Save the Nonword Transcription TextGrid.
-                    select TextGrid 'transBasename$'
-                    Save as text file... 'transFilepath$'
-                    # Update the number of CV-trials that have been transcribed.
-                    select Table 'transLogBasename$'
-                    Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
-                    # Save the Nonword Transcription Log.
-                    Save as tab-separated file... 'transLogFilepath$'
-                  else
-                    # If the transcriber (accidentally) hit the blank button
-                    # (i.e., the left-most button) during the prosody-transcription
-                    # phase, then print a message letting them know that they
-                    # need to clear all of their Praat objects and rerun the
-                    # script.
-                    printline Error during Prosody Transcription:
-                    printline   Clicking the blank button during the Prosody Transcription phase
-                    printline   causes a fatal script error.
-                    printline   Clear all of the objects from the Praat Object list, and then
-                    printline   rerun the script if you would like to continue transcribing.
-                    printline
-                    trial = nTrialsCV + 1
-                  endif
-                else
-                  # The target sequence was prosodically organized correctly;
-                  # hence, it also spanned the correct number of syllables.
-                  prosodyScore = 2
-                endif
-                # Add the 'prosodyScore' transcription to the TextGrid.
-                prosodyTranscription$ = "'prosodyScore'"
-                select TextGrid 'transBasename$'
-                prosodyInterval = Get interval at time... 'transTextGridProsody' 'segmentXMid'
-                Set interval text... 'transTextGridProsody' 'prosodyInterval' 'prosodyTranscription$'
-                # Save the Nonword Transcription TextGrid.
-                select TextGrid 'transBasename$'
-                Save as text file... 'transFilepath$'
+
+
+
+
+
+
+# Loop through the trial types
+trial_type1$ = "CV"
+trial_type2$ = "VC"
+trial_type3$ = "CC"
+current_type = 1
+current_type_limit = 4
+
+while current_type < current_type_limit
+	trial_type$ = trial_type'current_type'$
+
+	# Check if there are any trials to transcribe for this trial type.
+	trials_col$ = transLog'trial_type$'s$
+	done_col$ = transLog'trial_type$'sTranscribed$
+
+	@count_remaining_trials(transLogBasename$, 1, trials_col$, done_col$)
+	n_trials = count_remaining_trials.n_trials
+	n_transcribed = count_remaining_trials.n_transcribed
+	n_remaining = count_remaining_trials.n_remaining
+
+	# Trial numbers here refer to rows in the Word List table
+	trial = n_transcribed + 1
+
+	# If there are still trials to transcribe, ask the transcriber if she would like to transcribe them.
+	if n_transcribed < n_trials
+		beginPause("Transcribe 'trial_type$'-trials")
+			comment("There are 'n_remaining' 'trial_type$'-trials to transcribe.")
+			comment("Would you like to transcribe them?")
+		button = endPause("No", "Yes", 2, 1)
+	endif
+
+	# If the user chooses no, skip the transcription loop and break out of this loop.
+	if button == 1
+		trial = n_trials + 1
+		current_type = current_type_limit
+	endif
+
+	# Loop through the trials of the current type
+    while trial <= n_trials
+		# Get the Trial Number (a string value) of the current trial.
+		@selectTable(wordListBasename$ + "_" + trial_type$)
+		trialNumber$ = Get value: trial, wordListTrialNumber$
+
+		# Look up trial number in segmentation table. Compute trial midpoint from table.
+		@selectTable(segmentBasename$)
+		segTableRow = Search column: "text", trialNumber$
+		@get_xbounds_from_table(segmentBasename$, segTableRow)
+		trialXMid = get_xbounds_from_table.xmid
+
+		# Find bounds of the textgrid interval containing the trial midpoint
+		@get_xbounds_in_textgrid_interval(segmentBasename$, segTextGridTrial, trialXMid)
+
+		# Use the XMin and XMax of the current trial to extract that
+		# portion of the segmented TextGrid. The TextGrid that this
+		# operation creates will have the name:
+		# ::ExperimentalTask::_::ExperimentalID::_::SegmentersInitials::segm_part
+		@selectTextGrid(segmentBasename$)
+		Extract part: get_xbounds_in_textgrid_interval.xmin, get_xbounds_in_textgrid_interval.xmax, "yes"
+
+		# Convert the (extracted) TextGrid to a Table, which has the
+		# same name as the TextGrid from which it was created.
+		@selectTextGrid(segmentBasename$ + "_part")
+		Down to Table: "no", 6, "yes", "no"
+		@selectTextGrid(segmentBasename$ + "_part")
+		Remove
+
+		# Subset the 'segmentBasename$'_part Table to just the intervals
+		# on the Context Tier.
+		@selectTable(segmentBasename$ + "_part")
+		Extract rows where column (text): "tier", "is equal to", "Context"
+		@selectTable(segmentBasename$ + "_part")
+		Remove
+
+		# Get the Context label of the first segmented interval of this
+		# trial.
+		@selectTable(segmentBasename$ + "_part_Context")
+		contextLabel$ = Get value: 1, "text"
+
+		# [TRANSCRIPTION EVENT LOOP]
+
+		# If the trial [context] is not a nonresponse, [zoom] into the interval
+		# to be transcribed. Prompt user to transcribe [t1]. Determine [t1_score].
+		# Prompt user to transcribe [t2]. Determine [t2_score].
+		# Prompt user for [prosody_organization] and if necessary
+		# [prosody_span]. Determine [prosody_score], [save] and
+		# move onto [next_trial]. At any point, the user may [quit].
+		trans_node_context$ = "context"
+		trans_node_zoom$ = "zoom"
+		trans_node_t1$ = "t1"
+		trans_node_t1_score$ = "t1_score"
+		trans_node_t2$ = "t2"
+		trans_node_t2_score$ = "t2_score"
+		trans_node_prosody_organization$ = "prosody_organization"
+		trans_node_prosody_span$ = "prosody_span"
+		trans_node_prosody_score$ = "prosody_score"
+		trans_node_save$ = "save"
+		trans_node_next_trial$ = "next_trial"
+		trans_node_quit$ = "quit"
+
+		trans_node$ = trans_node_context$
+
+		while (trans_node$ != trans_node_quit$) and (trans_node$ != trans_node_next_trial$)
+			# [CHECK IF NONRESPONSE]
+			if trans_node$ == trans_node_context$
+				if contextLabel$ != "NonResponse"
+					trans_node$ = trans_node_zoom$
+				# Skip trial if nonresponse
+				else
+					trans_node$ = trans_node_save$
+				endif
+			endif
+
+			# [PREP TEXTGRID FOR TRANSCRIPTION]
+			if trans_node$ == trans_node_zoom$
+				# Determine the XMin and XMax of the segmented interval.
+				@get_xbounds_from_table(segmentBasename$ + "_part_Context", 1)
+				segmentXMid = get_xbounds_from_table.xmid
+
+				@get_xbounds_in_textgrid_interval(segmentBasename$, segTextGridContext, segmentXMid)
+				segmentXMin = get_xbounds_in_textgrid_interval.xmin
+				segmentXMax = get_xbounds_in_textgrid_interval.xmax
+
+				# Add interval boundaries on each tier.
+				@selectTextGrid(transBasename$)
+				Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMin
+				Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMax
+				Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMin
+				Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMax
+				Insert boundary: nwr_trans_textgrid.prosody, segmentXMin
+				Insert boundary: nwr_trans_textgrid.prosody, segmentXMax
+
+				# Zoom to the segmented interval in the editor window.
+				editor TextGrid 'transBasename$'
+					Zoom: segmentXMin - 0.25, segmentXMax + 0.25
+				endeditor
+
+				@selectTable(wordListBasename$ + "_" + trial_type$)
+				targetNonword$ = Get value: trial, wordListWorldBet$
+				target1$ = Get value: trial, wordListTarget1$
+				target2$ = Get value: trial, wordListTarget2$
+				trans_node$ = trans_node_t1$
+			endif
+
+			# [TRANSCRIBE T1]
+			if trans_node$ == trans_node_t1$
+				@transcribe_segment(trialNumber$, targetNonword$, target1$, target2$, 1)
+				@next_back_quit(transcribe_segment.result_node$, trans_node_t1_score$, "", trans_node_quit$)
+				trans_node$ = next_back_quit.result$
+			endif
+
+			# [SCORE T1]
+			if trans_node$ == trans_node_t1_score$
+				@selectTextGrid(transBasename$)
+				segmentInterval = Get interval at time: nwr_trans_textgrid.target1_seg, segmentXMid
+				Set interval text: nwr_trans_textgrid.target1_seg, segmentInterval, transcribe_segment.transcription$
+				trans_node$ = trans_node_t2$
+			endif
+
+			# [TRANSCRIBE T2]
+			if trans_node$ == trans_node_t2$
+				@transcribe_segment(trialNumber$, targetNonword$, target1$, target2$, 2)
+				@next_back_quit(transcribe_segment.result_node$, trans_node_t2_score$, "", trans_node_quit$)
+				trans_node$ = next_back_quit.result$
+			endif
+
+			# [SCORE T2]
+			if trans_node$ == trans_node_t2_score$
+				@selectTextGrid(transBasename$)
+				segmentInterval = Get interval at time: nwr_trans_textgrid.target2_seg, segmentXMid
+				Set interval text: nwr_trans_textgrid.target2_seg, segmentInterval, transcribe_segment.transcription$
+				trans_node$ = trans_node_prosody_organization$
+			endif
+
+			# [PROSODIC ORGANIZATION]
+			if trans_node$ == trans_node_prosody_organization$
+				@transcribe_prosody_organization(trialNumber$, targetNonword$, target1$, target2$)
+
+				@next_back_quit(transcribe_prosody_organization.result_node$, trans_node_prosody_span$, "", trans_node_quit$)
+				trans_node$ = next_back_quit.result$
+			endif
+
+			# [SYLLABLE SPAN]
+			if trans_node$ == trans_node_prosody_span$
+				# If the sequence is not prosodically organized correctly,
+				# prompt for syllable span information.
+				if transcribe_prosody_organization.organization != 1
+					@transcribe_prosody_span(trialNumber$, targetNonword$, target1$, target2$)
+
+					# If a score was obtained, make it available for next node.
+					if transcribe_prosody_span.result_node$ == node_next$
+						prosody_score = transcribe_prosody_span.span
+					endif
+
+					@next_back_quit(transcribe_prosody_span.result_node$, trans_node_prosody_score$ trans_node_prosody_organization, trans_node_quit$)
+					trans_node$ = next_back_quit.result$
+				# Otherwise, give a score of 2 for correct prosodic organization
+				else
+					prosody_score = 2
+					trans_node$ = trans_node_prosody_score$
+				endif
+			endif
+
+			# [PROSODY SCORE]
+			if trans_node$ == trans_node_prosody_score$
+				# 2: Correct organization
+				# 1: Incorrect organization, but at least correct syllable span
+				#    --e.g., an emergent production of a fricative.
+				# 0: Not even a correct syllable span
+				prosodyTranscription$ = "'prosody_score'"
+                @selectTextGrid(transBasename$)
+                prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
+                Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+				trans_node$ = trans_node_save$
+			endif
+
+			# [SAVE RESULTS]
+			if trans_node$ == trans_node_save$
+                @selectTextGrid(transBasename$)
+                Save as text file: nwr_trans_textgrid.filepath$
+
                 # Update the number of CV-trials that have been transcribed.
-                select Table 'transLogBasename$'
-                Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
-                # Save the Nonword Transcription Log.
-                Save as tab-separated file... 'transLogFilepath$'
-              else
-                # If the transcriber (accidentally) hit the blank button
-                # (i.e., the left-most button) during the prosody-transcription
-                # phase, then print a message letting them know that they
-                # need to clear all of their Praat objects and rerun the
-                # script.
-                printline Error during Prosody Transcription:
-                printline   Clicking the blank button during the Prosody Transcription phase
-                printline   causes a fatal script error.
-                printline   Clear all of the objects from the Praat Object list, and then
-                printline   rerun the script if you would like to continue transcribing.
-                printline
-                trial = nTrialsCV + 1
-              endif
-            else
-              # If the transcriber (accidentally) hit the blank button
-              # (i.e., the left-most button) during the vowel-transcription
-              # phase, then print a message letting them know that they
-              # need to clear all of their Praat objects and rerun the
-              # script.
-              printline Error during Vowel Transcription:
-              printline   Clicking the blank button during the Vowel Transcription phase
-              printline   causes a fatal script error.
-              printline   Clear all of the objects from the Praat Object list, and then
-              printline   rerun the script if you would like to continue transcribing.
-              printline
-              trial = nTrialsCV + 1
-            endif
-          endif
-        else
-          # If the transcriber decided to quit, then set the 'trial'
-          # variable so that the script breaks out of the while-loop.
-          trial = nTrialsCV + 1
-        endif
-      else
-        # If the segmented interval was a NonResponse, skip it, 
-        # and count it as a transcribed CV-trial.
-        select Table 'transLogBasename$'
-        Set numeric value... 1 'transLogCVsTranscribed$' 'trial'
-        # Save the Nonword Transcription Log
-        Save as tab-separated file... 'transLogFilepath$'
-      endif
-      # Increment the 'trial'.
-      trial = trial + 1
-      # Remove the segmented interval's Table from the Praat Object list.
-      select Table 'segmentBasename$'_part_Context
-      Remove
+                @selectTable(transLogBasename$)
+				log_col$ = transLog'trial_type$'sTranscribed$
+                Set numeric value: 1, log_col$, trial
+                Save as tab-separated file: nwr_trans_log.filepath$
+
+				trans_node$ = trans_node_next_trial$
+			endif
+		endwhile
+
+		# [QUIT]
+		if trans_node$ == trans_node_quit$
+			# If the transcriber decided to quit, then set the 'trial'
+			# variable so that the script breaks out of the while-loop.
+			trial = nTrialsCV + 1
+		endif
+
+		# [NEXT TRIAL]
+		if trans_node$ == trans_node_next_trial$
+			# Increment the 'trial'.
+			trial = trial + 1
+			# Remove the segmented interval's Table from the Praat Object list.
+			@selectTable(segmentBasename$ + "_part_Context")
+			Remove
+		endif
+
     endwhile
-  endif
-endif
+endwhile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+procedure count_nwr_wordlist_structures(.wordList_table$, .targetStructure$)
+	# Get the number of CV-trials in the Word List table.
+	@selectTable(.wordList_table$)
+	Extract rows where column (text): .targetStructure$, "is equal to", "CV"
+	.nTrialsCV = Get number of rows
+
+	# Get the number of VC-trials in the Word List table.
+	@selectTable(.wordList_table$)
+	Extract rows where column (text): .targetStructure$, "is equal to", "VC"
+	.nTrialsVC = Get number of rows
+
+	# Get the number of CC-trials in the Word List table.
+	@selectTable(.wordList_table$)
+	Extract rows where column (text): .targetStructure$, "is equal to", "CC"
+	.nTrialsCC = Get number of rows
+endproc
+
+
+
+procedure nwr_trans_log(.method$, .task$, .experimental_ID$, .initials$, .directory$, .n_cv, .n_vc, .n_cc)
+	# Description of the Nonword Transcription Log.
+	# A table with one row and the following columns (values).
+	# - NonwordTranscriber (string): the initials of the nonword
+	#     transcriber.
+	# - StartTime (string): the date & time that the transcription began.
+	# - EndTime (string): the date & time that the transcription ended.
+	# - NumberOfCVs (numeric): the number of trials (rows) in the Word
+	#     List table whose target sequence is a CV.
+	# - NumberOfCVsTranscribed (numeric): the number of CV-trials that
+	#     have been transcribed.
+	# - NumberOfVCs (numeric): the number of trials (rows) in the Word
+	#     List table whose target sequence is a VC.
+	# - NumberOfVCsTranscribed (numeric): the number of VC-trials that
+	#     have been transcribed.
+	# - NumberOfCCs (numeric): the number of trials (rows) in the Word
+	#     List table whose target sequence is a CC.
+	# - NumberOfCCsTranscribed (numeric): the number of CC-trials that
+	#     have been transcribed.
+	# Numeric and string constants for the NonwordTranscription Log.
+
+	# Numeric and string constants for the NWR transcription log
+	.transcriber     = 1
+	.transcriber$    = "NonwordTranscriber"
+	.start           = 2
+	.start$          = "StartTime"
+	.end             = 3
+	.end$            = "EndTime"
+	.cvs             = 4
+	.cvs$            = "NumberOfCVs"
+	.cvs_transcribed  = 5
+	.cvs_transcribed$ = "NumberOfCVsTranscribed"
+	.vcs             = 6
+	.vcs$            = "NumberOfVCs"
+	.vcs_transcribed  = 7
+	.vcs_transcribed$ = "NumberOfVCsTranscribed"
+	.ccs             = 8
+	.ccs$            = "NumberOfCCs"
+	.ccs_transcribed  = 9
+	.ccs_transcribed$ = "NumberOfCCsTranscribed"
+
+	# Concatenate column names argument for the Create Table command
+	column_names$ = "'.transcriber$' '.start$' '.end$' '.cvs$' '.cvs_transcribed$' '.vcs$' '.vcs_transcribed$' '.ccs$' '.ccs_transcribed$'"
+
+	# Filename constants
+	audio_basename$ = .experimental_ID$ + "_Audio"
+	.basename$ = .task$ + "_" + .experimental_ID$ + "_" + .initials$ + "transLog"
+	.filename$ = .basename$ + ".txt"
+	.filepath$ = .directory$ + "/" + .filename$
+	.exists = fileReadable(.filepath$)
+
+	## Pseudo-methods
+
+	if .method$ == "check"
+		# Do nothing. The checking already happened above. But we make a
+		# pseudomethod called "check" so we can describe what happens when
+		# only the above code is executed.
+	endif
+
+	if .method$ == "load"
+		if .exists
+			Read Table from tab-separated file: .filepath$
+		else
+			# Initialize the values of the Nonword Transcription Log.
+			Create Table with column names: .basename$, 1, column_names$
+
+			currentTime$ = replace$(date$(), " ", "_", 0)
+			@selectTable(.basename$)
+
+			Set string value: 1, .transcriber$, .initials$
+			Set string value: 1, .start$, currentTime$
+			Set string value: 1, .end$, currentTime$
+
+			Set numeric value: 1, .cvs_transcribed$, 0
+			Set numeric value: 1, .vcs_transcribed$, 0
+			Set numeric value: 1, .ccs_transcribed$, 0
+
+			Set numeric value: 1, .cvs$, .n_cv
+			Set numeric value: 1, .vcs$, .n_vc
+			Set numeric value: 1, .ccs$, .n_cc
+		endif
+	endif
+endproc
+
+procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .directory$)
+	# Numeric and string constants for the NWR transcription textgrid
+	.target1_seg   = 1
+	.target1_seg$  = "Target1Seg"
+	.target2_seg   = 2
+	.target2_seg$  = "Target2Pros"
+	.prosody      = 3
+	.prosody$     = "Prosody"
+	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$'"
+
+	audio_basename$ = .experimental_ID$ + "_Audio"
+	.basename$ = .task$ + "_" + .experimental_ID$ + "_" + .initials$ + "trans"
+	.filename$ = .basename$ + ".TextGrid"
+	.filepath$ = .directory$ + "/" + .filename$
+	.exists = fileReadable(.filepath$)
+
+	## Pseudo-methods
+
+	if .method$ == "check"
+		# Do nothing. The checking already happened above. But we make a
+		# pseudomethod called "check" so we can describe what happens when
+		# only the above code is executed.
+	endif
+
+	if .method$ == "load"
+		if .exists
+			Read from file: .filepath$
+		else
+			# Initialize the textgrid
+			@selectSound(audio_basename$)
+			To TextGrid: level_names$, ""
+			@selectTextGrid(audio_basename$)
+			Rename: .basename$
+		endif
+	endif
+endproc
+
+procedure count_remaining_trials(.log_basename$, .row, .trials_col$, .done_col$)
+	@selectTable(.log_basename$)
+	.n_trials = Get value: .row, .trials_col$
+	.n_transcribed = Get value: .row, .done_col$
+	.n_remaining = .n_trials - .n_transcribed
+endproc
+
+
+
+# Find up the xboundaries of an interval from a tabular representation of a textgrid
+procedure get_xbounds_from_table(.table$, .row)
+	@selectTable(.table$)
+	.xmin = Get value: .row, "tmin"
+	.xmax = Get value: .row, "tmax"
+	.xmid = (.xmin + .xmax) / 2
+endproc
+
+# Find the xboundaries of a textgrid interval that contains a given point.
+# The .point argument is usually the .xmid value obtained from the above
+# get_xbounds_from_table procedure.
+procedure get_xbounds_in_textgrid_interval(.textgrid$, .tier_num, .point)
+	@selectTextGrid(.textgrid$)
+	.interval = Get interval at time: .tier_num, .point
+	.xmin = Get start point: .tier_num, .interval
+	.xmax = Get end point: .tier_num, .interval
+	.xmid = (.xmin + .xmax) / 2
+endproc
+
+
+
+
+
+# Prompt the transcriber to transcribe the target CV prosodically.
+procedure transcribe_prosody_organization(.trial_number$, .word$, .target1$, .target2$)
+	beginPause("Prosodic Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
+
+		comment("Is the target sequence prosodically organized correctly?")
+		optionMenu("Prosodic organization", 1)
+		option("Yes")
+		option("No")
+	button = endPause("Quit", "Transcribe it!", 2, 1)
+
+	if button == 1
+		.result_node$ = node_quit$
+	else
+		.organization = prosodic_organization
+		.result_node$ = node_next$
+	endif
+
+endproc
+
+
+# If organization is not 1, check span
+procedure transcribe_prosody_span(.trial_number$, .word$, .target1$, .target2$)
+	beginPause("Prosodic Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
+
+		comment("Does the target sequence span the correct number of syllables?")
+		optionMenu("Syllable span", 1)
+			option("Yes")
+			option("No")
+		button = endPause("Back", "Quit", "Transcribe it!", 3)
+
+		if button == 1
+			.result_node$ = node_back$
+		elsif button == 2
+			.result_node$ = node_quit$
+		else
+			.span = syllable_span
+			.result_node$ = node_next$
+		endif
+endproc
+
+
+
+
+procedure transcribe_segment(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	# Dispatch based on vowel status
+	@is_vowel(.target'.target_number'$)
+	.vowel_status$ = is_vowel.name$
+
+	if .vowel_status$ == "vowel"
+		@transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target_number)
+		.result_node$ = transcribe_vowel.result_node$
+	else
+		@transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .target_number)
+		.result_node$ = transcribe_consonant.result_node$
+	endif
+
+	# Store the transcription if it exists
+	if .result_node$ != node_quit$
+			.transcription$ = transcribe_'.vowel_status$'.transcription$
+	endif
+endproc
+
+# Vowels are straightforward
+procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	.target_v$ = .target'.target_number'$
+
+	beginPause("Vowel Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+		optionMenu("Vowel height", 1)
+			option(high$)
+			option(mid$)
+			option(low$)
+		optionMenu("Vowel frontness", 1)
+			option(front$)
+			option(central$)
+			option(back$)
+		optionMenu("Vowel length", 1)
+			option(tense$)
+			option(lax$)
+			option(diphthong$)
+	button = endPause("Quit", "Transcribe it!", 2, 1)
+
+	if button == 1
+		.result_node$ = node_quit$
+	else
+		@score_vowel(.target_v$, vowel_height$, vowel_frontness$, vowel_length$)
+		.transcription$ = score_vowel.transcription$
+		.result_node$ = node_next$
+	endif
+endproc
+
+procedure score_vowel(.target_v$, .height$, .frontness$, .length$)
+	# True = 1, False = 0, so we just add the truth values to the score
+	.score = 0
+	.score = .score + (height_'.target_v$'$ == .height$)
+	.score = .score + (frontness_'.target_v$'$ == .frontness$)
+	.score = .score + (length_'.target_v$'$ == .length$)
+	.transcription$ = "'.height$','.frontness$','.length$';'.score'"
+endproc
+
+
+# Consonants involve multiple prompts/procedures contained in an event loop
+procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	.target_c$ = .target'.target_number'$
+
+	# Prompt user for [manner] then prompt for a  worldbet [symbol].
+	# Determine [place_voice] features for consonant. [score] consonant, and
+	# continue to the [next] step. At any point, the user may [quit].
+	cons_node_manner$ = "manner"
+	cons_node_symbol$ = "symbol"
+	cons_node_place_voice$ = "place_voice"
+	cons_node_score$ = "score"
+	cons_node_quit$ = "quit"
+	cons_node_next$ = "next"
+
+	cons_node$ = cons_node_manner$
+
+	while (cons_node$ != cons_node_quit$) and (cons_node$ != cons_node_next$)
+		# [MANNER]
+		if cons_node$ == cons_node_manner$
+			@transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .target_number)
+
+			@next_back_quit(transcribe_cons_manner.result_node$, cons_node_symbol$, "", cons_node_quit$)
+			cons_node$ = next_back_quit.result$
+		endif
+
+		# [SYMBOL]
+		if cons_node$ == cons_node_symbol$
+			consonantManner$ = transcribe_cons_manner.manner$
+			# Skip ahead to scoring node if consonant was omitted.
+			if consonantManner$ == omitted$
+				consonantSymbol$ = omitted$
+				consonantManner$ = omitted$
+				consonantPlace$ = omitted$
+				consonantVoicing$ = omitted$
+				cons_node$ = cons_node_score$
+
+			# Otherwise, user chooses a worldbet symbol
+			else
+				@transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, consonantManner$)
+
+				@next_back_quit(transcribe_cons_symbol.result_node$, cons_node_place_voice$, cons_node_manner$, cons_node_quit$)
+				cons_node$ = next_back_quit.result$
+			endif
+		endif
+
+		# [PLACE AND VOICING]
+		if cons_node$ == cons_node_place_voice$
+			consonantSymbol$ = transcribe_cons_symbol.symbol$
+			@transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target2$, .target_number, consonantSymbol$)
+
+			# Export place and voicing features to namespace
+			if transcribe_cons_place_voice.result_node$ == node_next$
+				consonantPlace$ = transcribe_cons_place_voice.place$
+				consonantVoicing$ = transcribe_cons_place_voice.voicing$
+			endif
+
+			@next_back_quit(transcribe_cons_place_voice.result_node$, cons_node_score$, cons_node_symbol$, cons_node_quit$)
+			cons_node$ = next_back_quit.result$
+		endif
+
+		# [SCORE CONSONANT]
+		if cons_node$ == cons_node_score$
+			# Compute the consonant's segmental score.
+			@score_consonant(.target_c$, consonantSymbol$, consonantManner$, consonantPlace$, consonantVoicing$)
+			.transcription$ = score_consonant.transcription$
+			cons_node$ = cons_node_next$
+		endif
+	endwhile
+
+	.result_node$ = if (cons_node$ == cons_node_next$) then node_next$ else node_quit$ endif
+endproc
+
+
+procedure transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	beginPause("Consonant Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+		optionMenu("Consonant manner", 1)
+			option(stop$)
+			option(affricate$)
+			option(fricative$)
+			option(nasal$)
+			option(glide$)
+			option(omitted$)
+	button = endPause("Quit", "Transcribe it!", 2, 1)
+
+	if button == 1
+		.result_node$ = node_quit$
+	else
+		.result_node$ = node_next$
+		.manner$ = consonant_manner$
+	endif
+endproc
+
+procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, .manner$)
+	# If the consonant was not omitted, then prompt the transcriber
+	# to select the consonant's transcription from a list of
+	# WorldBet symbols.
+
+	beginPause("Consonant Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+
+		optionMenu("Consonant transcription", 1)
+			if .manner$ == stop$
+				option("p")
+				option("b")
+				option("t")
+				option("d")
+				option("tr")
+				option("dr")
+				option("t(")
+				option("d(")
+				option("c")
+				option("J")
+				option("k")
+				option("g")
+				option("q")
+				option("Q")
+				option("?")
+				option(other$)
+			elsif .manner$ == affricate$
+				option("ts")
+				option("dz")
+				option("tS")
+				option("dZ")
+				option(other$)
+			elsif .manner$ == fricative$
+				option("F")
+				option("V")
+				option("f")
+				option("v")
+				option("T")
+				option("D")
+				option("s")
+				option("z")
+				option("S")
+				option("Z")
+				option("C")
+				option("j^")
+				option("x")
+				option("G")
+				option("X")
+				option("K")
+				option("H")
+				option("!")
+				option("h")
+				option("hv")
+				option(other$)
+			elsif .manner$ == nasal$
+				option("m")
+				option("n")
+				option("N")
+				option(other$)
+			elsif .manner$ == glide$
+				option("j")
+				option("w")
+				option(other$)
+			endif
+	button = endPause("Back", "Quit", "Transcribe it!", 3)
+
+	if button == 1
+		.result_node$ = node_back$
+	elsif button == 2
+		.result_node$ = node_quit$
+	else
+		.result_node$ = node_next$
+		.symbol$ = consonant_transcription$
+	endif
+endproc
+
+
+procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target2$, .target_number, .symbol$)
+	# If the transcriber selected a WorldBet symbol, then parse its features.
+	if .symbol$ != "Other"
+		# Translate the '.symbol$' to a character key that can be used to look up the Place and Voicing features.
+		if .symbol$ == "t("
+			.key$ = "tFlap"
+		elsif .symbol$ == "d("
+			.key$ = "dFlap"
+		elsif .symbol$ == "?"
+			.key$ = "glotStop"
+		elsif .symbol$ == "j^"
+			.key$ = "jV"
+		elsif .symbol$ == "!"
+			.key$ = "exclaim"
+		else
+			.key$ = .symbol$
+		endif
+
+		# Use the '.key$' to look up the Place and Voicing features.
+		#consonantSymbol$ = .symbol$
+		#consonantPlace$ = place_'consonantKey$'$
+		#consonantVoicing$ = voicing_'consonantKey$'$
+		.place$ = place_'.key$'$
+		.voicing$ = voicing_'.key$'$
+		.result_node$ = node_next$
+
+	# If the transcriber did not select a WorldBet symbol, then prompt her to select the Place and Voicing features from drop-down menus.
+	else
+		beginPause("Consonant Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+
+			optionMenu("Consonant place", 1)
+				option(bilabial$)
+				option(labiodental$)
+				option(labiovelar$)
+				option(dental$)
+				option(alveolar$)
+				option(postalveolar$)
+				option(retroflex$)
+				option(palatal$)
+				option(velar$)
+				option(uvular$)
+				option(pharyngeal$)
+				option(glottal$)
+			optionMenu("Consonant voicing", 1)
+				option(voiced$)
+				option(voiceless$)
+		button = endPause("Back", "Quit", "Transcribe it!", 3)
+
+		if button == 1
+			.result_node$ = node_back$
+		elsif button == 2
+			.result_node$ = node_quit$
+		else
+			.result_node$ = node_next$
+			.place$ = consonant_place$
+			.voicing$ = consonant_voicing$
+		endif
+
+	endif
+
+endproc
+
+procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
+	# True = 1, False = 0, so we just add the truth values to the score
+	.score = 0
+	.score = .score + (manner_'.target_c$'$ == .manner$)
+	.score = .score + (place_'.target_c$'$ == .place$)
+	.score = .score + (voicing_'.target_c$'$ == .voicing$)
+	.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'.score'"
+endproc
+
+
+# These lines appear in every transcription prompt
+procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	# Neither sound is currently being transcribed by default
+	target1_is_current$ = ""
+	target2_is_current$ = ""
+
+	if .target_number = 1
+		target1_is_current$ = " (currently transcribing)"
+	elsif .target_number = 2
+		target2_is_current$ = " (currently transcribing)"
+	endif
+
+	@is_vowel(.target1$)
+	.type1$ = is_vowel.name$
+	@is_vowel(.target2$)
+	.type2$ = is_vowel.name$
+
+	line_3$ = "Target " + .type1$ + target1_is_current$ + ": " + .target1$
+	line_4$ = "Target " + .type2$ + target2_is_current$ + ": " + .target2$
+
+	comment("Trial number: '.trial_number$'")
+	comment("Target nonword: '.word$'")
+	comment(line_3$)
+	comment(line_4$)
+endproc
 
 
 
