@@ -5,7 +5,7 @@ Praat code for transcribing the NWR recordings collected as a part of the Learni
 
 To do:
 ------
-* Update vowel scoring so that diphthongs are scored for frontness and height using the first vowel in the diphthong.
+
 * Update prosody scoring to score 1 point for not deleting segments and 1 point for not inserting segments. We also need to note whether a vowel was inserted, because an inserted vowel would definitely affect the syllable structure in the production.
 
 ### References

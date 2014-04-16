@@ -5,7 +5,7 @@ fricative$ = "Fricative"
 nasal$     = "Nasal"
 glide$     = "Glide"
 omitted$   = "Omitted"
-approximant$ = "Approximant"
+
 manner_p$        = stop$
 manner_b$        = stop$
 manner_t$        = stop$
@@ -50,7 +50,8 @@ manner_n$        = nasal$
 manner_N$        = nasal$
 manner_j$        = glide$
 manner_w$        = glide$
-manner_l$        = approximant$
+manner_l$        = glide$
+manner_r$        = glide$
 
 # Place feature values for the consonants.
 bilabial$     = "Bilabial"
@@ -111,6 +112,7 @@ place_N$        = velar$
 place_j$        = palatal$
 place_w$        = labiovelar$
 place_l$        = alveolar$
+place_r$        = alveolar$
 
 # Voicing feature values for the consonants.
 voiced$    = "Voiced"
@@ -160,6 +162,7 @@ voicing_N$        = voiced$
 voicing_j$        = voiced$
 voicing_w$        = voiced$
 voicing_l$        = voiced$
+voicing_r$        = voiced$
 
 # Height feature values for the target vowels.
 high$      = "High"
@@ -167,10 +170,8 @@ mid$       = "Mid"
 low$       = "Low"
 xxxxxxx$   = "XXXXXXXXXX"
 height_ae$ = mid$
-height_aU$ = xxxxxxx$
 height_i$  = high$
 height_I$  = high$
-height_oi$ = xxxxxxx$
 height_u$  = high$
 height_U$  = high$
 height_V$  = mid$
@@ -180,10 +181,8 @@ front$        = "Front"
 central$      = "Central"
 back$         = "Back"
 frontness_ae$ = front$
-frontness_aU$ = xxxxxxx$
 frontness_i$  = front$
 frontness_I$  = front$
-frontness_oi$ = xxxxxxx$
 frontness_u$  = back$
 frontness_U$  = back$
 frontness_V$  = back$
@@ -201,10 +200,23 @@ length_u$   = tense$
 length_U$   = lax$
 length_V$   = lax$
 
+# Diphthongs are coded using their starting vowel. "aw" refers to worldbet ">"
+height_a$ = low$
+height_aU$ = height_a$
+
+height_aw$ = mid$
+height_oi$ = height_aw$
+
+frontness_a$ = back$
+frontness_aU$ = frontness_a$
+
+frontness_aw$ = back$
+frontness_oi$ = frontness_aw$
+
 # We will have to update the look-up list if more vowels are ever considered
 procedure is_vowel(.x$)
 	.id$ = "_" + .x$ + "_"
-	match = rindex("_ae_aU_i_I_oi_u_U_V_", .id$)
+	match = rindex("_ae_aU_i_I_oi_u_U_V_a_aw_", .id$)
 	.result = (match != 0)
 	.name$ = if .result then "vowel" else "consonant" endif
 endproc

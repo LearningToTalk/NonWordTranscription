@@ -603,6 +603,8 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 			option(tense$)
 			option(lax$)
 			option(diphthong$)
+		comment("Note: Diphthongs are scored for height and frontness using ")
+		comment("the first vowel in the diphthong (/o/ for /oi/ and /a/ for /aU/)")
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
@@ -779,6 +781,8 @@ procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .
 			elsif .manner$ == glide$
 				option("j")
 				option("w")
+				option("l")
+				option("r")
 				option(other$)
 			endif
 	button = endPause("Back", "Quit", "Transcribe it!", 3)
