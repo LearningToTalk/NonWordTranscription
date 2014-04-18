@@ -106,16 +106,19 @@ while current_type < current_type_limit
 	n_transcribed = count_remaining_trials.n_transcribed
 	n_remaining = count_remaining_trials.n_remaining
 
-	# Trial numbers here refer to rows in the Word List table
-	trial = n_transcribed + 1
-
+	# Jump to next type if there are no remaining trials to transcribe
+	if n_remaining == 0
+		current_type = current_type + 1
 	# If there are still trials to transcribe, ask the transcriber if she would like to transcribe them.
-	if n_transcribed < n_trials
+	elsif n_transcribed < n_trials
 		beginPause("Transcribe 'trial_type$'-trials")
 			comment("There are 'n_remaining' 'trial_type$'-trials to transcribe.")
 			comment("Would you like to transcribe them?")
 		button = endPause("No", "Yes", 2, 1)
-	endif
+	endif	
+		
+	# Trial numbers here refer to rows in the Word List table
+	trial = n_transcribed + 1
 
 	# If the user chooses no, skip the transcription loop and break out of this loop.
 	if button == 1
