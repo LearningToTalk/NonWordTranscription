@@ -740,6 +740,7 @@ procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .
 				option("h")
 				option("hv")
 				option("hl")
+				option("hlv")
 				option(other$)
 			elsif .manner$ == nasal$
 				option("m")
