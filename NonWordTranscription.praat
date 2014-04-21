@@ -718,27 +718,17 @@ procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .
 				option("b")
 				option("t")
 				option("d")
-				option("tr")
-				option("dr")
 				option("t(")
 				option("d(")
-				option("c")
-				option("J")
 				option("k")
 				option("g")
-				option("q")
-				option("Q")
 				option("?")
 				option(other$)
 			elsif .manner$ == affricate$
-				option("ts")
-				option("dz")
 				option("tS")
 				option("dZ")
 				option(other$)
 			elsif .manner$ == fricative$
-				option("F")
-				option("V")
 				option("f")
 				option("v")
 				option("T")
@@ -747,16 +737,9 @@ procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .
 				option("z")
 				option("S")
 				option("Z")
-				option("C")
-				option("j^")
-				option("x")
-				option("G")
-				option("X")
-				option("K")
-				option("H")
-				option("!")
 				option("h")
 				option("hv")
+				option("hl")
 				option(other$)
 			elsif .manner$ == nasal$
 				option("m")
@@ -793,10 +776,6 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 			.key$ = "dFlap"
 		elsif .symbol$ == "?"
 			.key$ = "glotStop"
-		elsif .symbol$ == "j^"
-			.key$ = "jV"
-		elsif .symbol$ == "!"
-			.key$ = "exclaim"
 		else
 			.key$ = .symbol$
 		endif
@@ -818,11 +797,7 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 				option(dental$)
 				option(alveolar$)
 				option(postalveolar$)
-				option(retroflex$)
-				option(palatal$)
 				option(velar$)
-				option(uvular$)
-				option(pharyngeal$)
 				option(glottal$)
 			optionMenu("Consonant voicing", 1)
 				option(voiced$)
