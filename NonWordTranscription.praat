@@ -172,9 +172,8 @@ while current_type < current_type_limit
 		# If the trial [context] is not a nonresponse, [zoom] into the interval
 		# to be transcribed. Prompt user to transcribe [t1]. Determine [t1_score].
 		# Prompt user to transcribe [t2]. Determine [t2_score].
-		# Prompt user for [prosody_organization] and if necessary
-		# [prosody_span]. Determine [prosody_score], [save] and
-		# move onto [next_trial]. At any point, the user may [quit].
+		# Prompt user for [prosody] features. Determine [prosody_score], record [notes], 
+		# [save] and move onto [next_trial]. At any point, the user may [quit].
 		trans_node_context$ = "context"
 		trans_node_zoom$ = "zoom"
 		trans_node_t1$ = "t1"
@@ -183,6 +182,7 @@ while current_type < current_type_limit
 		trans_node_t2_score$ = "t2_score"
 		trans_node_prosody$ = "prosody"
 		trans_node_prosody_score$ = "prosody_score"
+		trans_node_notes$ = "notes"
 		trans_node_save$ = "save"
 		trans_node_next_trial$ = "next_trial"
 		trans_node_quit$ = "quit"
@@ -275,22 +275,32 @@ while current_type < current_type_limit
 				# -1 for deleting a segment
 				# -1 for inserting a segment
 				prosodyTranscription$ = transcribe_prosody.transcription$
-                @selectTextGrid(transBasename$)
-                prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
-                Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+        			@selectTextGrid(transBasename$)
+                		prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
+		                Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
 				trans_node$ = trans_node_save$
 			endif
 
+
+			# [STUB FOR NOTES TIERS]
+			if trans_node$ == trans_node_notes$
+
+
+
+
+			endif
+
+
 			# [SAVE RESULTS]
 			if trans_node$ == trans_node_save$
-                @selectTextGrid(transBasename$)
-                Save as text file: nwr_trans_textgrid.filepath$
-
-                # Update the number of CV-trials that have been transcribed.
-                @selectTable(transLogBasename$)
+		                @selectTextGrid(transBasename$)
+		                Save as text file: nwr_trans_textgrid.filepath$
+		
+		                # Update the number of CV-trials that have been transcribed.
+		                @selectTable(transLogBasename$)
 				log_col$ = transLog'trial_type$'sTranscribed$
-                Set numeric value: 1, log_col$, trial
-                Save as tab-separated file: nwr_trans_log.filepath$
+		                Set numeric value: 1, log_col$, trial
+                		Save as tab-separated file: nwr_trans_log.filepath$
 
 				trans_node$ = trans_node_next_trial$
 			endif
@@ -514,6 +524,7 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 		comment("Were any extra segments inserted into or next to the target sequence?")
 		boolean("An extra consonant was added", 0)
 		boolean("An extra vowel was added", 0)
+		
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
