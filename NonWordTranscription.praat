@@ -606,17 +606,22 @@ endproc
 procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	.target_v$ = .target'.target_number'$
 
+	@vowel_menu_defaults(.target_v$)
+	default_height = vowel_menu_defaults.height_num
+	default_frontness = vowel_menu_defaults.frontness_num
+	default_length = vowel_menu_defaults.length_num
+	
 	beginPause("Vowel Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
-		optionMenu("Vowel height", 1)
+		optionMenu("Vowel height", default_height)
 			option(high$)
 			option(mid$)
 			option(low$)
-		optionMenu("Vowel frontness", 1)
+		optionMenu("Vowel frontness", default_frontness)
 			option(front$)
 			option(central$)
 			option(back$)
-		optionMenu("Vowel length", 1)
+		optionMenu("Vowel length", default_length)
 			option(tense$)
 			option(lax$)
 			option(diphthong$)
@@ -630,6 +635,39 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 		@score_vowel(.target_v$, vowel_height$, vowel_frontness$, vowel_length$)
 		.transcription$ = score_vowel.transcription$
 		.result_node$ = node_next$
+	endif
+endproc
+
+# To make transcription more user friendly, the vowel feature drop-downs 
+# should select the correct feature values as defaults.
+procedure vowel_menu_defaults(.target_v$)
+	# Look up the feature values for the vowel
+	.height$ = height_'.target_v$'$
+	.frontness$ = frontness_'.target_v$'$
+	.length$ = length_'.target_v$'$
+	
+	# Default to first item in drop-down
+	.height_num = 1
+	.frontness_num = 1
+	.length_num = 1
+	
+	# Change the default item when it's not the first feature in the drop-down
+	if .height$ == mid$
+		.height_num = 2
+	elsif .height$ == low$
+		.height_num = 3
+	endif
+	
+	if .frontness$ == central$
+		.frontness_num = 2
+	elsif .frontness$ == back$
+		.frontness_num = 3
+	endif
+	
+	if .length$ == lax$
+		.length_num = 2
+	elsif  .length$ == diphthong$
+		.length_num = 3
 	endif
 endproc
 
