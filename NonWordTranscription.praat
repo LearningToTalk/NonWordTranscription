@@ -639,7 +639,7 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 endproc
 
 # To make transcription more user friendly, the vowel feature drop-downs 
-# should select the correct feature values as defaults.
+# selects the correct feature values as defaults.
 procedure vowel_menu_defaults(.target_v$)
 	# Look up the feature values for the vowel
 	.height$ = height_'.target_v$'$
@@ -862,7 +862,7 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
 
 			optionMenu("Consonant place", 1)
-				option(bilabial$)
+				option(labial$)
 				option(labiodental$)
 				option(labiovelar$)
 				option(dental$)
