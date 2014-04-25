@@ -127,7 +127,7 @@ while current_type < current_type_limit
 	endif
 
 	# Loop through the trials of the current type
-    while trial <= n_trials
+	while trial <= n_trials
 		# Get the Trial Number (a string value) of the current trial.
 		@selectTable(wordListBasename$ + "_" + trial_type$)
 		trialNumber$ = Get value: trial, wordListTrialNumber$
@@ -182,7 +182,8 @@ while current_type < current_type_limit
 		trans_node_t2_score$ = "t2_score"
 		trans_node_prosody$ = "prosody"
 		trans_node_prosody_score$ = "prosody_score"
-		trans_node_notes$ = "notes"
+		trans_node_notes_prompt$ = "notes_prompt"
+		trans_node_notes_save$ = "notes_save"
 		trans_node_save$ = "save"
 		trans_node_next_trial$ = "next_trial"
 		trans_node_quit$ = "quit"
@@ -271,36 +272,46 @@ while current_type < current_type_limit
 
 			# [PROSODY SCORE]
 			if trans_node$ == trans_node_prosody_score$
-				# 2 points possible
+				# 3 points possible
 				# -1 for deleting a segment
 				# -1 for inserting a segment
+				# -1 for adding or omitting syllables
 				prosodyTranscription$ = transcribe_prosody.transcription$
-        			@selectTextGrid(transBasename$)
-                		prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
-		                Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+				@selectTextGrid(transBasename$)
+				prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
+				Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+				trans_node$ = trans_node_notes_prompt$
+			endif
+
+			# [PROMPT FOR NOTES]
+			if trans_node$ == trans_node_notes_prompt$
+				@transcribe_notes(trialNumber$, targetNonword$, target1$, target2$)
+				
+				@next_back_quit(transcribe_notes.result_node$, trans_node_notes_save$, "", trans_node_quit$)
+				trans_node$ = next_back_quit.result$
+			endif
+			
+			# [WRITE NOTES]
+			if trans_node$ == trans_node_notes_save$
+				
+				# Add a point only if there are notes to write down
+				if !transcribe_notes.no_notes
+					@selectTextGrid(transBasename$)
+					Insert point: nwr_trans_textgrid.notes, segmentXMid, transcribe_notes.notes$
+				endif
 				trans_node$ = trans_node_save$
 			endif
-
-
-			# [STUB FOR NOTES TIERS]
-			if trans_node$ == trans_node_notes$
-
-
-
-
-			endif
-
-
+			
 			# [SAVE RESULTS]
 			if trans_node$ == trans_node_save$
-		                @selectTextGrid(transBasename$)
-		                Save as text file: nwr_trans_textgrid.filepath$
+						@selectTextGrid(transBasename$)
+						Save as text file: nwr_trans_textgrid.filepath$
 		
-		                # Update the number of CV-trials that have been transcribed.
-		                @selectTable(transLogBasename$)
+						# Update the number of CV-trials that have been transcribed.
+						@selectTable(transLogBasename$)
 				log_col$ = transLog'trial_type$'sTranscribed$
-		                Set numeric value: 1, log_col$, trial
-                		Save as tab-separated file: nwr_trans_log.filepath$
+						Set numeric value: 1, log_col$, trial
+						Save as tab-separated file: nwr_trans_log.filepath$
 
 				trans_node$ = trans_node_next_trial$
 			endif
@@ -321,17 +332,9 @@ while current_type < current_type_limit
 			@selectTable(segmentBasename$ + "_part_Context")
 			Remove
 		endif
-
-    endwhile
+		
+	endwhile
 endwhile
-
-
-
-
-
-
-
-
 
 
 
@@ -444,14 +447,17 @@ endproc
 
 procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .directory$)
 	# Numeric and string constants for the NWR transcription textgrid
-	.target1_seg   = 1
-	.target1_seg$  = "Target1Seg"
-	.target2_seg   = 2
-	.target2_seg$  = "Target2Pros"
-	.prosody      = 3
-	.prosody$     = "Prosody"
-	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$'"
-
+	.target1_seg = 1
+	.target2_seg = 2
+	.prosody = 3
+	.notes = 4
+	
+	.target1_seg$ = "Target1Seg"
+	.target2_seg$ = "Target2Seg"
+	.prosody$ = "Prosody"
+	.notes$ = "TransNotes"
+	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$' '.notes$'"
+	
 	audio_basename$ = .experimental_ID$ + "_Audio"
 	.basename$ = .task$ + "_" + .experimental_ID$ + "_" + .initials$ + "trans"
 	.filename$ = .basename$ + ".TextGrid"
@@ -472,7 +478,7 @@ procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .d
 		else
 			# Initialize the textgrid
 			@selectSound(audio_basename$)
-			To TextGrid: level_names$, ""
+			To TextGrid: level_names$, .notes$
 			@selectTextGrid(audio_basename$)
 			Rename: .basename$
 		endif
@@ -525,19 +531,30 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 		boolean("An extra consonant was added", 0)
 		boolean("An extra vowel was added", 0)
 		
+		comment("Were any syllables inserted or deleted (anywhere) in the target word?")
+		boolean("An extra syllable was added", 0)
+		boolean("A syllable was deleted (production is a fragment)", 0)
+		comment("Note: Check these 2 boxes only when there too few or too many syllables")
+		
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
 		.result_node$ = node_quit$
 	else
+		# Score each of the 3 points
 		.deletion = one_or_both_of_the_segments_were_deleted
+		
 		.cons_added = an_extra_consonant_was_added
 		.vowel_added = an_extra_vowel_was_added
 		.insertion = .cons_added or .vowel_added
 		
-		.score = 2 - (.insertion + .deletion)
+		.syl_added = an_extra_syllable_was_added
+		.syl_deleted = a_syllable_was_deleted
+		.syllable = .syl_added or .syl_deleted
 		
-		# Make text for three-part transcription: [deletion];[insertion];[score]
+		.score = 3 - (.insertion + .deletion + .syllable)
+		
+		# Make text for four-part transcription: [deletion];[insertion];[syllable];[score]
 		if .deletion
 			.prosody1$ = "segment_deleted"
 		else
@@ -554,7 +571,17 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 			.prosody2$ = "nothing_added"
 		endif
 		
-		.transcription$ = "'.prosody1$';'.prosody2$';'.score'"
+		if .syl_added and .syl_deleted
+			.prosody3$ = "syl_added,syl_deleted,this_point_is_not_reliable"
+		elsif .syl_added
+			.prosody3$ = "syl_added"
+		elsif .syl_deleted
+			.prosody3$ = "syl_deleted"
+		else
+			.prosody3$ = "syl_correct"
+		endif
+		
+		.transcription$ = "'.prosody1$';'.prosody2$';'.prosody3$';'.score'"
 
 		.result_node$ = node_next$
 	endif
@@ -585,20 +612,28 @@ endproc
 procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	.target_v$ = .target'.target_number'$
 
+	@vowel_menu_defaults(.target_v$)
+	default_height = vowel_menu_defaults.height_num
+	default_frontness = vowel_menu_defaults.frontness_num
+	default_length = vowel_menu_defaults.length_num
+	
 	beginPause("Vowel Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
-		optionMenu("Vowel height", 1)
+		optionMenu("Vowel height", default_height)
 			option(high$)
 			option(mid$)
 			option(low$)
-		optionMenu("Vowel frontness", 1)
+			option(omitted$)
+		optionMenu("Vowel frontness", default_frontness)
 			option(front$)
 			option(central$)
 			option(back$)
-		optionMenu("Vowel length", 1)
+			option(omitted$)
+		optionMenu("Vowel length", default_length)
 			option(tense$)
 			option(lax$)
 			option(diphthong$)
+			option(omitted$)
 		comment("Note: Diphthongs are scored for height and frontness using ")
 		comment("the first vowel in the diphthong (/o/ for /oi/ and /a/ for /aU/)")
 	button = endPause("Quit", "Transcribe it!", 2, 1)
@@ -609,6 +644,39 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 		@score_vowel(.target_v$, vowel_height$, vowel_frontness$, vowel_length$)
 		.transcription$ = score_vowel.transcription$
 		.result_node$ = node_next$
+	endif
+endproc
+
+# To make transcription more user friendly, the vowel feature drop-downs 
+# selects the correct feature values as defaults.
+procedure vowel_menu_defaults(.target_v$)
+	# Look up the feature values for the vowel
+	.height$ = height_'.target_v$'$
+	.frontness$ = frontness_'.target_v$'$
+	.length$ = length_'.target_v$'$
+	
+	# Default to first item in drop-down
+	.height_num = 1
+	.frontness_num = 1
+	.length_num = 1
+	
+	# Change the default item when it's not the first feature in the drop-down
+	if .height$ == mid$
+		.height_num = 2
+	elsif .height$ == low$
+		.height_num = 3
+	endif
+	
+	if .frontness$ == central$
+		.frontness_num = 2
+	elsif .frontness$ == back$
+		.frontness_num = 3
+	endif
+	
+	if .length$ == lax$
+		.length_num = 2
+	elsif  .length$ == diphthong$
+		.length_num = 3
 	endif
 endproc
 
@@ -803,7 +871,7 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
 
 			optionMenu("Consonant place", 1)
-				option(bilabial$)
+				option(labial$)
 				option(labiodental$)
 				option(labiovelar$)
 				option(dental$)
@@ -838,6 +906,30 @@ procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
 	.score = .score + (voicing_'.target_c$'$ == .voicing$)
 	.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'.score'"
 endproc
+
+
+
+
+# Prompt the user to enter notes about the transcription
+procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
+	beginPause("Transcription Notes")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
+
+		comment("You may enter any notes about this transcription below: ")
+		text("transcriber_notes", "")
+		
+	button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
+
+	if button == 1
+		.result_node$ = node_quit$
+	else
+		.notes$ = transcriber_notes$
+		.no_notes = length(.notes$) == 0
+		.result_node$ = node_next$
+	endif
+endproc
+
+
 
 
 # These lines appear in every transcription prompt
