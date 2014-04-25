@@ -525,19 +525,30 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 		boolean("An extra consonant was added", 0)
 		boolean("An extra vowel was added", 0)
 		
+		comment("Were any syllables inserted or deleted (anywhere) in the target word?")
+		boolean("An extra syllable was added", 0)
+		boolean("A syllable was deleted (production is a fragment)", 0)
+		comment("Note: Check these 2 boxes only when there too few or too many syllables")
+		
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
 		.result_node$ = node_quit$
 	else
+		# Score each of the 3 points
 		.deletion = one_or_both_of_the_segments_were_deleted
+		
 		.cons_added = an_extra_consonant_was_added
 		.vowel_added = an_extra_vowel_was_added
 		.insertion = .cons_added or .vowel_added
 		
-		.score = 2 - (.insertion + .deletion)
+		.syl_added = an_extra_syllable_was_added
+		.syl_deleted = a_syllable_was_deleted
+		.syllable = .syl_added or .syl_deleted
 		
-		# Make text for three-part transcription: [deletion];[insertion];[score]
+		.score = 3 - (.insertion + .deletion + .syllable)
+		
+		# Make text for four-part transcription: [deletion];[insertion];[syllable];[score]
 		if .deletion
 			.prosody1$ = "segment_deleted"
 		else
@@ -554,7 +565,17 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 			.prosody2$ = "nothing_added"
 		endif
 		
-		.transcription$ = "'.prosody1$';'.prosody2$';'.score'"
+		if .syl_added and .syl_deleted
+			.prosody3$ = "syl_added,syl_deleted,this_point_is_not_reliable"
+		elsif .syl_added
+			.prosody3$ = "syl_added"
+		elsif .syl_deleted
+			.prosody3$ = "syl_deleted"
+		else
+			.prosody3$ = "syl_correct"
+		endif
+		
+		.transcription$ = "'.prosody1$';'.prosody2$';'.prosody3$';'.score'"
 
 		.result_node$ = node_next$
 	endif
