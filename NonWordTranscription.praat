@@ -127,7 +127,7 @@ while current_type < current_type_limit
 	endif
 
 	# Loop through the trials of the current type
-    while trial <= n_trials
+	while trial <= n_trials
 		# Get the Trial Number (a string value) of the current trial.
 		@selectTable(wordListBasename$ + "_" + trial_type$)
 		trialNumber$ = Get value: trial, wordListTrialNumber$
@@ -182,7 +182,8 @@ while current_type < current_type_limit
 		trans_node_t2_score$ = "t2_score"
 		trans_node_prosody$ = "prosody"
 		trans_node_prosody_score$ = "prosody_score"
-		trans_node_notes$ = "notes"
+		trans_node_notes_prompt$ = "notes_prompt"
+		trans_node_notes_save$ = "notes_save"
 		trans_node_save$ = "save"
 		trans_node_next_trial$ = "next_trial"
 		trans_node_quit$ = "quit"
@@ -271,36 +272,46 @@ while current_type < current_type_limit
 
 			# [PROSODY SCORE]
 			if trans_node$ == trans_node_prosody_score$
-				# 2 points possible
+				# 3 points possible
 				# -1 for deleting a segment
 				# -1 for inserting a segment
+				# -1 for adding or omitting syllables
 				prosodyTranscription$ = transcribe_prosody.transcription$
-        			@selectTextGrid(transBasename$)
-                		prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
-		                Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+				@selectTextGrid(transBasename$)
+				prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
+				Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
+				trans_node$ = trans_node_notes_prompt$
+			endif
+
+			# [PROMPT FOR NOTES]
+			if trans_node$ == trans_node_notes_prompt$
+				@transcribe_notes(trialNumber$, targetNonword$, target1$, target2$)
+				
+				@next_back_quit(transcribe_notes.result_node$, trans_node_notes_save$, "", trans_node_quit$)
+				trans_node$ = next_back_quit.result$
+			endif
+			
+			# [WRITE NOTES]
+			if trans_node$ == trans_node_notes_save$
+				
+				# Add a point only if there are notes to write down
+				if !transcribe_notes.no_notes
+					@selectTextGrid(transBasename$)
+					Insert point: nwr_trans_textgrid.notes, segmentXMid, transcribe_notes.notes$
+				endif
 				trans_node$ = trans_node_save$
 			endif
-
-
-			# [STUB FOR NOTES TIERS]
-			if trans_node$ == trans_node_notes$
-
-
-
-
-			endif
-
-
+			
 			# [SAVE RESULTS]
 			if trans_node$ == trans_node_save$
-		                @selectTextGrid(transBasename$)
-		                Save as text file: nwr_trans_textgrid.filepath$
+						@selectTextGrid(transBasename$)
+						Save as text file: nwr_trans_textgrid.filepath$
 		
-		                # Update the number of CV-trials that have been transcribed.
-		                @selectTable(transLogBasename$)
+						# Update the number of CV-trials that have been transcribed.
+						@selectTable(transLogBasename$)
 				log_col$ = transLog'trial_type$'sTranscribed$
-		                Set numeric value: 1, log_col$, trial
-                		Save as tab-separated file: nwr_trans_log.filepath$
+						Set numeric value: 1, log_col$, trial
+						Save as tab-separated file: nwr_trans_log.filepath$
 
 				trans_node$ = trans_node_next_trial$
 			endif
@@ -321,17 +332,9 @@ while current_type < current_type_limit
 			@selectTable(segmentBasename$ + "_part_Context")
 			Remove
 		endif
-
-    endwhile
+		
+	endwhile
 endwhile
-
-
-
-
-
-
-
-
 
 
 
@@ -444,14 +447,17 @@ endproc
 
 procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .directory$)
 	# Numeric and string constants for the NWR transcription textgrid
-	.target1_seg   = 1
-	.target1_seg$  = "Target1Seg"
-	.target2_seg   = 2
-	.target2_seg$  = "Target2Pros"
-	.prosody      = 3
-	.prosody$     = "Prosody"
-	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$'"
-
+	.target1_seg = 1
+	.target2_seg = 2
+	.prosody = 3
+	.notes = 4
+	
+	.target1_seg$ = "Target1Seg"
+	.target2_seg$ = "Target2Seg"
+	.prosody$ = "Prosody"
+	.notes$ = "TransNotes"
+	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$' '.notes$'"
+	
 	audio_basename$ = .experimental_ID$ + "_Audio"
 	.basename$ = .task$ + "_" + .experimental_ID$ + "_" + .initials$ + "trans"
 	.filename$ = .basename$ + ".TextGrid"
@@ -472,7 +478,7 @@ procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .d
 		else
 			# Initialize the textgrid
 			@selectSound(audio_basename$)
-			To TextGrid: level_names$, ""
+			To TextGrid: level_names$, .notes$
 			@selectTextGrid(audio_basename$)
 			Rename: .basename$
 		endif
@@ -900,6 +906,30 @@ procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
 	.score = .score + (voicing_'.target_c$'$ == .voicing$)
 	.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'.score'"
 endproc
+
+
+
+
+# Prompt the user to enter notes about the transcription
+procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
+	beginPause("Transcription Notes")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
+
+		comment("You may enter any notes about this transcription below: ")
+		text("transcriber_notes", "")
+		
+	button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
+
+	if button == 1
+		.result_node$ = node_quit$
+	else
+		.notes$ = transcriber_notes$
+		.no_notes = length(.notes$) == 0
+		.result_node$ = node_next$
+	endif
+endproc
+
+
 
 
 # These lines appear in every transcription prompt
