@@ -56,7 +56,7 @@ manner_l$        = glide$
 manner_r$        = glide$
 
 # Place feature values for the consonants.
-labial$     = "Labial"
+labial$       = "Labial"
 labiodental$  = "Labiodental"
 dental$       = "Dental"
 alveolar$     = "Alveolar"
@@ -120,7 +120,7 @@ place_n$        = alveolar$
 place_N$        = velar$
 place_j$        = palatal$
 place_w$        = labiovelar$
-place_l$        = alveolar$
+place_l$        = lateral$
 place_r$        = alveolar$
 
 # Voicing feature values for the consonants.
