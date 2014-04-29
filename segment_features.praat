@@ -56,7 +56,7 @@ manner_l$        = glide$
 manner_r$        = glide$
 
 # Place feature values for the consonants.
-labial$     = "Labial"
+labial$       = "Bilabial"
 labiodental$  = "Labiodental"
 dental$       = "Dental"
 alveolar$     = "Alveolar"
@@ -71,11 +71,11 @@ labiovelar$   = "Labiovelar"
 lateral$      = "lateral"
 other$        = "Other"
 
-# /p,b,f,v/ have the same place feature.
+
 place_p$        = labial$
 place_b$        = labial$
-place_f$        = labial$
-place_v$        = labial$
+place_f$        = labiodental$
+place_v$        = labiodental$
 
 place_t$        = alveolar$
 place_d$        = alveolar$
@@ -120,7 +120,7 @@ place_n$        = alveolar$
 place_N$        = velar$
 place_j$        = palatal$
 place_w$        = labiovelar$
-place_l$        = alveolar$
+place_l$        = lateral$
 place_r$        = alveolar$
 
 # Voicing feature values for the consonants.
@@ -180,7 +180,7 @@ high$      = "High"
 mid$       = "Mid"
 low$       = "Low"
 xxxxxxx$   = "XXXXXXXXXX"
-height_ae$ = mid$
+height_ae$ = low$
 height_i$  = high$
 height_I$  = high$
 height_u$  = high$
