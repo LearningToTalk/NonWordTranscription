@@ -181,11 +181,14 @@ mid$       = "Mid"
 low$       = "Low"
 xxxxxxx$   = "XXXXXXXXXX"
 height_ae$ = low$
+height_a$  = low$
 height_i$  = high$
 height_I$  = high$
 height_u$  = high$
 height_U$  = high$
 height_V$  = mid$
+height_o$  = mid$
+height_aw$ = mid$
 
 # Frontness feature values for the target vowels.
 front$        = "Front"
@@ -197,6 +200,9 @@ frontness_I$  = front$
 frontness_u$  = back$
 frontness_U$  = back$
 frontness_V$  = back$
+frontness_o$  = back$
+frontness_aw$ = back$
+frontness_a$  = back$
 
 # Length feature values for the target vowels.
 tense$     = "Tense"
@@ -210,24 +216,19 @@ length_oi$  = diphthong$
 length_u$   = tense$
 length_U$   = lax$
 length_V$   = lax$
+length_o$   = tense$
 
-# Diphthongs are coded using their starting vowel. "aw" refers to worldbet ">"
-height_a$ = low$
+# Diphthongs place features are coded using the starting vowel (nucleus)
 height_aU$ = height_a$
+height_oi$ = height_o$
 
-height_aw$ = mid$
-height_oi$ = height_aw$
-
-frontness_a$ = back$
 frontness_aU$ = frontness_a$
-
-frontness_aw$ = back$
-frontness_oi$ = frontness_aw$
+frontness_oi$ = frontness_o$
 
 # We will have to update the look-up list if more vowels are ever considered
 procedure is_vowel(.x$)
 	.id$ = "_" + .x$ + "_"
-	match = rindex("_ae_aU_i_I_oi_u_U_V_a_aw_", .id$)
+	match = rindex("_ae_aU_i_I_oi_u_U_V_a_aw_o_", .id$)
 	.result = (match != 0)
 	.name$ = if .result then "vowel" else "consonant" endif
 endproc
