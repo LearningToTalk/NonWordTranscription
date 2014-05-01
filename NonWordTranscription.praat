@@ -1,15 +1,42 @@
+# NonWordTranscription.praat
+# Version 1
+# Author: Patrick Reidy
+# Date: 10 August 2013
+
+# NonWordTranscription.praat
+# Version 2
+# Author: Tristan Mahr
+# Date: 16-18 April 2014
+# 1) Most of the code is now encapsulated in procedures. 
+# 2) CV trial type has been generalized so VC and CV trials are now supported.
+# 3) Start-up wizard now re-uses code from segmentation start-up.
+# 4) Minimum version of praat is now enforced, so can use "Command: [args]" notation.
+# 5) Procedures are also used to contain or (hide) related variables in a common namespace. 
+# 6) Multistep transcription wizards (consonants, prosody) support a back-button.
+# 7) Functionality is now broken up over multiple files.
+# 8) Script can now transition to next type of trial when finished with CV
+
+# NonWordTranscription.praat
+# Version 3
+# Author: Mary Beckman
+# Date: 01 May 2014
+# 09) vowel transcription changed to parallel consonant transcription
+# 10) transcription and scoring separated for non-canonical substitutions
+# 11) category of "unclassifiable" added to both C and V transcription
+# Left to do:
+# If we decide to adopt this strategy, should add way of making the correct transcription
+# be the default choice at each of the two steps.
+
+#######################################################################
 # Controls whether the @log_[...] procedures write to the InfoLines.
 debug_mode = 1
 
+# Include the other files mentioned in change 7 of version 2.
 include check_version.praat
 include procs.praat
 include segment_features.praat
 include startup_procs.praat
 include transcription_startup.praat
-
-
-
-
 
 # Numeric and string constants for the Word List Table.
 wordListBasename$ = startup_nwr_wordlist.table$
@@ -23,16 +50,11 @@ wordListTargetStructure$ = startup_nwr_wordlist.target_structure$
 segTextGridTrial = startup_segm_textgrid.trial
 segTextGridContext = startup_segm_textgrid.context
 
-
-
-
 # Count the trials of structure type
 @count_nwr_wordlist_structures(wordListBasename$, wordListTargetStructure$)
 nTrialsCV = count_nwr_wordlist_structures.nTrialsCV
 nTrialsVC = count_nwr_wordlist_structures.nTrialsVC
 nTrialsCC = count_nwr_wordlist_structures.nTrialsCC
-
-
 
 # Check that the log and textgrid exist already
 @nwr_trans_log("check", task$, experimental_ID$, initials$, transLogDirectory$, nTrialsCV, nTrialsVC, nTrialsCC)
@@ -55,9 +77,6 @@ else
 	exitScript: msg$
 endif
 
-
-
-
 # Export values to global namespace
 segmentBasename$ = startup_segm_textgrid.basename$
 audioBasename$ = startup_load_audio.audio_sound$
@@ -72,21 +91,20 @@ transLogVCsTranscribed$ = nwr_trans_log.vcs_transcribed$
 transLogCCs$ = nwr_trans_log.ccs$
 transLogCCsTranscribed$ = nwr_trans_log.ccs_transcribed$
 
+#######################################################################
+# Open an Edit window with the segmentation textgrid, so that the transcriber can examine
+# the larger segmentation context to recoup from infelicitous segmenting of false starts
+# and the like. 
+@selectTextGrid(segmentBasename$)
+Edit
 
-
-
-# Open an Editor window.
+# Open a separate Editor window with the transcription textgrid object and audio file.
 @selectTextGrid(transBasename$)
 plusObject("Sound " + audioBasename$)
 Edit
 # Set the Spectrogram settings, etc., here.
 
-
-
-
-
-
-
+#######################################################################
 # Loop through the trial types
 trial_type1$ = "CV"
 trial_type2$ = "VC"
@@ -94,6 +112,7 @@ trial_type3$ = "CC"
 current_type = 1
 current_type_limit = 4
 
+# [TRIAL TYPE LOOP]
 while current_type < current_type_limit
 	trial_type$ = trial_type'current_type'$
 
@@ -323,6 +342,7 @@ while current_type < current_type_limit
 			# variable so that the script breaks out of the while-loop.
 			trial = nTrialsCV + 1
 		endif
+##### This results in a very ungraceful way to quit midstream.  Figure out a better way.
 
 		# [NEXT TRIAL]
 		if trans_node$ == trans_node_next_trial$
@@ -337,11 +357,15 @@ while current_type < current_type_limit
 endwhile
 
 
+#######################################################################
+# PROCEDURE definitions start here
 
 
-
-
-
+#### PROCEDURE to count NWR wordlist structures for each of the three structure types.
+# This should work for RWR wordlist structures, too, when those are modified so that 
+# the 24 (or 26?) real words that are matched with nonwords for the lexicality effect
+# are transcribed, if we make sure that the TargetStructure column is in the same 
+# place and includes "CV" only for those 24 (or 26?) rows. 
 procedure count_nwr_wordlist_structures(.wordList_table$, .targetStructure$)
 	# Get the number of CV-trials in the Word List table.
 	@selectTable(.wordList_table$)
@@ -360,7 +384,7 @@ procedure count_nwr_wordlist_structures(.wordList_table$, .targetStructure$)
 endproc
 
 
-
+#### PROCEDURE to load the transcription log file or create the transcription log Table object.
 procedure nwr_trans_log(.method$, .task$, .experimental_ID$, .initials$, .directory$, .n_cv, .n_vc, .n_cc)
 	# Description of the Nonword Transcription Log.
 	# A table with one row and the following columns (values).
@@ -445,6 +469,8 @@ procedure nwr_trans_log(.method$, .task$, .experimental_ID$, .initials$, .direct
 	endif
 endproc
 
+
+#### PROCEDURE to load the transcription textgrid file or create the TextGrid object.
 procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .directory$)
 	# Numeric and string constants for the NWR transcription textgrid
 	.target1_seg = 1
@@ -485,6 +511,8 @@ procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .d
 	endif
 endproc
 
+
+#### PROCEDURE to count the remaining trials yet to be transribed.
 procedure count_remaining_trials(.log_basename$, .row, .trials_col$, .done_col$)
 	@selectTable(.log_basename$)
 	.n_trials = Get value: .row, .trials_col$
@@ -493,8 +521,8 @@ procedure count_remaining_trials(.log_basename$, .row, .trials_col$, .done_col$)
 endproc
 
 
-
-# Find up the xboundaries of an interval from a tabular representation of a textgrid
+#### PROCEDURE to find xmin and xmax from Table representation of TextGrid
+# Find the xboundaries of an interval from a tabular representation of a textgrid
 procedure get_xbounds_from_table(.table$, .row)
 	@selectTable(.table$)
 	.xmin = Get value: .row, "tmin"
@@ -502,6 +530,7 @@ procedure get_xbounds_from_table(.table$, .row)
 	.xmid = (.xmin + .xmax) / 2
 endproc
 
+#### PROCEDURE to get xmin and xmax of interval in TextGrid object from time point 
 # Find the xboundaries of a textgrid interval that contains a given point.
 # The .point argument is usually the .xmid value obtained from the above
 # get_xbounds_from_table procedure.
@@ -515,17 +544,19 @@ endproc
 
 
 
+#######################################################################
+# TIER-SPECIFIC PROCEDURE definitions start here
 
-
-
-
-# Prompt the transcriber to transcribe the target CV prosodically.
+#### PROCEDURE to transcribe attributes of prosodic structure on tier for prosody points 
+# Prompt the transcriber to transcribe the target sequence prosodically.
 procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 	beginPause("Prosodic Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
 
 		comment("Were any segments in the sequence deleted?")
 		boolean("One or both of the segments were deleted", 0)
+# Need to modify above so that it is calculated directly from the choice of omitted at the 
+# initial stage of choosing [MANNER] for a consonant or [LENGTH] for a vowel. 
 		
 		comment("Were any extra segments inserted into or next to the target sequence?")
 		boolean("An extra consonant was added", 0)
@@ -535,7 +566,8 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 		boolean("An extra syllable was added", 0)
 		boolean("A syllable was deleted (production is a fragment)", 0)
 		comment("Note: Check these 2 boxes only when there too few or too many syllables")
-		
+# QUESTION: Do we need to modify above so that transcriber cannot choose both? 
+
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
@@ -588,7 +620,7 @@ procedure transcribe_prosody(.trial_number$, .word$, .target1$, .target2$)
 endproc
 
 
-
+#### PROCEDURE to transcribe a segment on tiers for target segment 1 and target segment 2 
 procedure transcribe_segment(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	# Dispatch based on vowel status
 	@is_vowel(.target'.target_number'$)
@@ -608,88 +640,214 @@ procedure transcribe_segment(.trial_number$, .word$, .target1$, .target2$, .targ
 	endif
 endproc
 
-# Vowels are straightforward
+
+####  PROCEDURE : outer wrapper for nodes to prompt stages of VOWEL transcription
+# Vowels involve multiple prompts/procedures contained in an event loop
 procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	.target_v$ = .target'.target_number'$
 
-	@vowel_menu_defaults(.target_v$)
-	default_height = vowel_menu_defaults.height_num
-	default_frontness = vowel_menu_defaults.frontness_num
-	default_length = vowel_menu_defaults.length_num
-	
+	# Prompt user for [LENGTH] then prompt for a  worldbet [VOWEL SYMBOL] of English or
+	# for a potentially free-form symbolic worldbet representation of some [OTHER] sound(s).
+	# [SCORE] vowel, and continue to the [NEXT] step. At any point, the user may [QUIT].
+	vowel_node_length$ = "length"
+	vowel_node_symbol$ = "symbol"
+	vowel_node_height_frontness$ = "height_frontness"
+	vowel_node_score$ = "score"
+	vowel_node_quit$ = "quit"
+	vowel_node_next$ = "next"
+
+	vowel_node$ = vowel_node_length$
+
+	while (vowel_node$ != vowel_node_quit$) and (vowel_node$ != vowel_node_next$)
+		# [LENGTH]
+		if vowel_node$ == vowel_node_length$
+			@transcribe_vowel_length(.trial_number$, .word$, .target1$, .target2$, .target_number)
+
+			@next_back_quit(transcribe_vowel_length.result_node$, vowel_node_symbol$, "", vowel_node_quit$)
+			vowel_node$ = next_back_quit.result$
+		endif
+
+		# [SYMBOL]
+		if vowel_node$ == vowel_node_symbol$
+			vowelLength$ = transcribe_vowel_length.length$
+			# Skip ahead to scoring node if vowel was omitted.
+			if vowelLength$ == omitted$
+				vowelSymbol$ = omitted$
+				vowelLength$ = omitted$
+				vowelHeight$ = omitted$
+				vowelFrontness$ = omitted$
+				vowel_node$ = vowel_node_score$
+
+			# Skip ahead to scoring node if vowel was unclassifiable.
+			elsif vowelLength$ == unclassifiable$
+				vowelSymbol$ = unclassifiable$
+				vowelLength$ = unclassifiable$
+				vowelHeight$ = unclassifiable$
+				vowelFrontness$ = unclassifiable$
+				vowel_node$ = vowel_node_score$
+
+			# Otherwise, user chooses a worldbet symbol
+			else
+				@transcribe_vowel_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, vowelLength$)
+
+				@next_back_quit(transcribe_vowel_symbol.result_node$, vowel_node_height_frontness$, vowel_node_length$, vowel_node_quit$)
+				vowel_node$ = next_back_quit.result$
+			endif
+		endif
+
+		# [HEIGHT AND FRONTNESS]
+		if vowel_node$ == vowel_node_height_frontness$
+			vowelSymbol$ = transcribe_vowel_symbol.symbol$
+			@transcribe_vowel_height_frontness(.trial_number$, .word$, .target1$, .target2$, .target_number, vowelSymbol$)
+
+			# Export symbol to namespace
+			if transcribe_vowel_height_frontness.result_node$ == node_next$
+				vowelLength$ = transcribe_vowel_height_frontness.length$
+				vowelHeight$ = transcribe_vowel_height_frontness.height$
+				vowelFrontness$ = transcribe_vowel_height_frontness.frontness$
+			endif
+
+			@next_back_quit(transcribe_vowel_height_frontness.result_node$, vowel_node_score$, vowel_node_symbol$, vowel_node_quit$)
+			vowel_node$ = next_back_quit.result$
+		endif
+
+		# [SCORE VOWEL]
+		if vowel_node$ == vowel_node_score$
+			# Compute the vowel's segmental score.
+			@score_vowel(.target_v$, vowelSymbol$, vowelLength$, vowelHeight$, vowelFrontness$)
+			.transcription$ = score_vowel.transcription$
+			vowel_node$ = vowel_node_next$
+		endif
+	endwhile
+
+	.result_node$ = if (vowel_node$ == vowel_node_next$) then node_next$ else node_quit$ endif
+endproc
+
+#### PROCEDURE for [VOWEL LENGTH]
+procedure transcribe_vowel_length(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	beginPause("Vowel Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
-		optionMenu("Vowel height", default_height)
-			option(high$)
-			option(mid$)
-			option(low$)
-			option(omitted$)
-		optionMenu("Vowel frontness", default_frontness)
-			option(front$)
-			option(central$)
-			option(back$)
-			option(omitted$)
-		optionMenu("Vowel length", default_length)
+		comment("Choose from the following 3 sets of English vowel phones:")
+		comment("    diphthongs : /aI/, /aU/, /oI/") 
+		comment("    tense or long vowels : /i/, /e/, /ae/, /a/, /o/, /u/")
+		comment("    short or lax vowels : /I/, /E/, /3r/, /V/, /U/")
+		comment("or specify how the production does not fit into these sets.") 
+		choice("Vowel length", 2)
+			option(diphthong$)
 			option(tense$)
 			option(lax$)
-			option(diphthong$)
 			option(omitted$)
-		comment("Note: Diphthongs are scored for height and frontness using ")
-		comment("the first vowel in the diphthong (/o/ for /oi/ and /a/ for /aU/)")
+			option(other$)
+			option(unclassifiable$)
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
 		.result_node$ = node_quit$
 	else
-		@score_vowel(.target_v$, vowel_height$, vowel_frontness$, vowel_length$)
-		.transcription$ = score_vowel.transcription$
 		.result_node$ = node_next$
+		.length$ = vowel_length$
 	endif
 endproc
 
-# To make transcription more user friendly, the vowel feature drop-downs 
-# selects the correct feature values as defaults.
-procedure vowel_menu_defaults(.target_v$)
-	# Look up the feature values for the vowel
-	.height$ = height_'.target_v$'$
-	.frontness$ = frontness_'.target_v$'$
-	.length$ = length_'.target_v$'$
-	
-	# Default to first item in drop-down
-	.height_num = 1
-	.frontness_num = 1
-	.length_num = 1
-	
-	# Change the default item when it's not the first feature in the drop-down
-	if .height$ == mid$
-		.height_num = 2
-	elsif .height$ == low$
-		.height_num = 3
-	endif
-	
-	if .frontness$ == central$
-		.frontness_num = 2
-	elsif .frontness$ == back$
-		.frontness_num = 3
-	endif
-	
-	if .length$ == lax$
-		.length_num = 2
-	elsif  .length$ == diphthong$
-		.length_num = 3
+#### PROCEDURE for [VOWEL SYMBOL] if production is one of 14 vowels of target dialects or a know.
+procedure transcribe_vowel_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, .length$)
+	# If the vowel was not omitted or unclassifiable, then prompt the transcriber to select the vowel's
+	# transcription from a list of WorldBet symbols for the 14 vowel phonemes or some other already
+	# attested and analyzed transcription for a vowel.
+
+	beginPause("Vowel Transcription")
+		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+
+		choice("Vowel transcription", 1)
+			if .length$ == diphthong$
+				option("aI")
+				option("aU")
+				option("oI")
+			elsif .length$ == tense$
+				option("i")
+				option("e")
+				option("ae")
+				option("a")
+				option("o")
+				option("u")
+			elsif .length$ == lax$
+				option("I")
+				option("E")
+				option("3r")
+				option("V")
+				option("U")
+			elsif .length$ == other$
+				option("or")
+				option(other$)
+			endif
+	button = endPause("Back", "Quit", "Transcribe it!", 3)
+
+	if button == 1
+		.result_node$ = node_back$
+	elsif button == 2
+		.result_node$ = node_quit$
+	else
+		.result_node$ = node_next$
+		.symbol$ = vowel_transcription$
 	endif
 endproc
 
-procedure score_vowel(.target_v$, .height$, .frontness$, .length$)
+#### PROCEDURE for parsing the features for a VOWEL from its symbol.
+procedure transcribe_vowel_height_frontness(.trial_number$, .word$, .target1$, .target2$, .target_number, .symbol$)
+	# If the transcriber selected a WorldBet symbol, then parse its features.
+	if .symbol$ != "Other"
+		.key$ = .symbol$
+
+		# If the transcriber selected a WorldBet symbol from the list of transcribed substitutions of something
+		# other than an English vowel phoneme, we need to use the '.key$' to look up the Length feature,
+		# so may as well redundantly do that for all.
+		.length$ = length_'.key$'$
+
+		# Use the '.key$' to look up the Height and Frontness features.
+		.height$ = height_'.key$'$
+		.frontness$ = frontness_'.key$'$
+		.result_node$ = node_next$
+
+	else
+	# If the transcriber did not select a WorldBet symbol from either the 14 English vowels or from the
+	# already added set of other substitutions, then prompt her to provide a worldbet symbolization.
+		beginPause("")
+			@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
+
+			comment("Enter the worldbet for this (non-English?) syllable nucleus: ")
+			text("Vowel transcription", "")
+	
+#		button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
+		button = endPause("Back", "Quit", "Transcribe it!", 3)
+
+		if button == 1
+			.result_node$ = node_back$
+		elsif button == 2
+			.result_node$ = node_quit$
+		else
+			.result_node$ = node_next$
+			.symbol$ = vowel_transcription$
+			.length$ = to_be_determined$
+			.height$ = to_be_determined$
+			.frontness$ = to_be_determined$
+		endif
+
+	endif
+
+endproc
+
+
+#### PROCEDURE to [SCORE VOWEL].
+procedure score_vowel(.target_v$, .symbol$, .length$, .height$, .frontness$)
 	# True = 1, False = 0, so we just add the truth values to the score
 	.score = 0
+	.score = .score + (length_'.target_v$'$ == .length$)
 	.score = .score + (height_'.target_v$'$ == .height$)
 	.score = .score + (frontness_'.target_v$'$ == .frontness$)
-	.score = .score + (length_'.target_v$'$ == .length$)
-	.transcription$ = "'.height$','.frontness$','.length$';'.score'"
+	.transcription$ = "'.symbol$';'.length$','.height$','.frontness$';'.score'"
 endproc
 
-
+####  PROCEDURE : outer wrapper for nodes to prompt stages of CONSONANT transcription
 # Consonants involve multiple prompts/procedures contained in an event loop
 procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	.target_c$ = .target'.target_number'$
@@ -726,7 +884,16 @@ procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .ta
 				consonantVoicing$ = omitted$
 				cons_node$ = cons_node_score$
 
-			# Otherwise, user chooses a worldbet symbol
+			# Skip ahead to scoring node also if consonant was unclassifiable.
+			elsif consonantManner$ == unclassifiable$
+				consonantSymbol$ = unclassifiable$
+				consonantManner$ = unclassifiable$
+				consonantPlace$ = unclassifiable$
+				consonantVoicing$ = unclassifiable$
+				cons_node$ = cons_node_score$
+
+			# Otherwise, user chooses a WorldBet symbol from among those offered 
+			# for the 24 consonant phonemes of the target dialects of English, etc.. 
 			else
 				@transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, consonantManner$)
 
@@ -742,6 +909,7 @@ procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .ta
 
 			# Export place and voicing features to namespace
 			if transcribe_cons_place_voice.result_node$ == node_next$
+				consonantManner$ = transcribe_cons_place_voice.manner$
 				consonantPlace$ = transcribe_cons_place_voice.place$
 				consonantVoicing$ = transcribe_cons_place_voice.voicing$
 			endif
@@ -762,18 +930,27 @@ procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .ta
 	.result_node$ = if (cons_node$ == cons_node_next$) then node_next$ else node_quit$ endif
 endproc
 
-
+#### PROCEDURE for [CONSONANT MANNER]
 procedure transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	beginPause("Consonant Transcription")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
-		optionMenu("Consonant manner", 1)
+		comment("Choose from the following 5 sets of English consonants:")
+		comment("   stops : /p/, /t/, /k/, /b/, /d/, /g/")
+		comment("   affricates : /tS/, /dZ/")
+		comment("   fricatives : /f/, /T/, /s/, /S/, /h/, /v/, /D/, /z/, /Z/")
+		comment("   nasals : /m/, /n/, /N")
+		comment("   glides : /w/, /j/, /r/, /l/")
+		comment("or specify how the production does not fit into any of the sets.") 
+		choice("Consonant manner", 1)
 			option(stop$)
 			option(affricate$)
 			option(fricative$)
 			option(nasal$)
 			option(glide$)
 			option(omitted$)
-	button = endPause("Quit", "Transcribe it!", 2, 1)
+			option(other$)
+			option(unclassifiable$)
+	button = endPause("Quit", "Transcribe it!", 2)
 
 	if button == 1
 		.result_node$ = node_quit$
@@ -783,54 +960,47 @@ procedure transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .
 	endif
 endproc
 
+#### PROCEDURE for [CONSONANT SYMBOL]
 procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, .manner$)
-	# If the consonant was not omitted, then prompt the transcriber
-	# to select the consonant's transcription from a list of
-	# WorldBet symbols.
 
+	# If the consonant is one of the 24 consonant phonemes (or some other symbolizable sound),
+	# then prompt the transcriber to select the consonant's transcription from the list of WorldBet 
+	# symbols for the 24 phonemes (or from the list of other recognized sounds).
 	beginPause("Consonant Transcription")
-		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
 
-		optionMenu("Consonant transcription", 1)
+		choice("Consonant transcription", 1)
 			if .manner$ == stop$
 				option("p")
-				option("b")
 				option("t")
-				option("d")
-				option("t(")
-				option("d(")
 				option("k")
+				option("b")
+				option("d")
 				option("g")
-				option("?")
-				option(other$)
 			elsif .manner$ == affricate$
 				option("tS")
 				option("dZ")
-				option(other$)
 			elsif .manner$ == fricative$
 				option("f")
-				option("v")
 				option("T")
-				option("D")
 				option("s")
-				option("z")
 				option("S")
-				option("Z")
 				option("h")
-				option("hv")
-				option("hl")
-				option("hlv")
-				option(other$)
+				option("v")
+				option("D")
+				option("z")
+				option("Z")
 			elsif .manner$ == nasal$
 				option("m")
 				option("n")
 				option("N")
-				option(other$)
 			elsif .manner$ == glide$
 				option("j")
 				option("w")
 				option("l")
 				option("r")
+			elsif .manner$ == other$
+				option("hl")
 				option(other$)
 			endif
 	button = endPause("Back", "Quit", "Transcribe it!", 3)
@@ -846,6 +1016,7 @@ procedure transcribe_cons_symbol(.trial_number$, .word$, .target1$, .target2$, .
 endproc
 
 
+#### PROCEDURE for parsing the features for a CONSONANT from its symbol.
 procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target2$, .target_number, .symbol$)
 	# If the transcriber selected a WorldBet symbol, then parse its features.
 	if .symbol$ != "Other"
@@ -860,28 +1031,26 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 			.key$ = .symbol$
 		endif
 
+		# If the transcriber selected a WorldBet symbol from the list of transcribed substitutions of something
+		# other than an English consonant phoneme, we need to use the '.key$' to look up the Manner feature,
+		# so may as well redundantly do that for all.
+		.manner$ = manner_'.key$'$
+
 		# Use the '.key$' to look up the Place and Voicing features.
 		.place$ = place_'.key$'$
 		.voicing$ = voicing_'.key$'$
 		.result_node$ = node_next$
 
-	# If the transcriber did not select a WorldBet symbol, then prompt her to select the Place and Voicing features from drop-down menus.
 	else
-		beginPause("Consonant Transcription")
-		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+	# If the transcriber did not select a WorldBet symbol from either the 24 English consonants or from the
+	# already added set of other sounds, then prompt her to provide a worldbet symbolization.
+		beginPause("")
+			@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
 
-			optionMenu("Consonant place", 1)
-				option(labial$)
-				option(labiodental$)
-				option(labiovelar$)
-				option(dental$)
-				option(alveolar$)
-				option(postalveolar$)
-				option(velar$)
-				option(glottal$)
-			optionMenu("Consonant voicing", 1)
-				option(voiced$)
-				option(voiceless$)
+			comment("Enter the worldbet for this non-English consonant: ")
+			text("Consonant transcription", "")
+	
+#		button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
 		button = endPause("Back", "Quit", "Transcribe it!", 3)
 
 		if button == 1
@@ -890,14 +1059,52 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 			.result_node$ = node_quit$
 		else
 			.result_node$ = node_next$
-			.place$ = consonant_place$
-			.voicing$ = consonant_voicing$
+			.symbol$ = consonant_transcription$
+			.manner$ = to_be_determined$
+			.place$ = to_be_determined$
+			.voicing$ = to_be_determined$
 		endif
+
+	# Alternatively, we might also prompt her to select the Manner, Place, and Voicing features 
+	# from drop-down menus? 
+#		beginPause("Consonant Transcription")
+#		@trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
+#
+#			optionMenu("Consonant manner", 1)
+#				option(stop$)
+#				option(affricate$)
+#				option(fricative$)
+#				option(nasal$)
+#				option(glide$)
+#			optionMenu("Consonant place", 1)
+#				option(labial$)
+#				option(labiodental$)
+#				option(labiovelar$)
+#				option(dental$)
+#				option(alveolar$)
+#				option(postalveolar$)
+#				option(velar$)
+#				option(glottal$)
+#			optionMenu("Consonant voicing", 1)
+#				option(voiced$)
+#				option(voiceless$)
+#		button = endPause("Back", "Quit", "Transcribe it!", 3)
+#
+#		if button == 1
+#			.result_node$ = node_back$
+#		elsif button == 2
+#			.result_node$ = node_quit$
+#		else
+#			.result_node$ = node_next$
+#			.place$ = consonant_place$
+#			.voicing$ = consonant_voicing$
+#		endif
 
 	endif
 
 endproc
 
+#### PROCEDURE for scoring a CONSONANT
 procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
 	# True = 1, False = 0, so we just add the truth values to the score
 	.score = 0
@@ -908,8 +1115,7 @@ procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
 endproc
 
 
-
-
+#### PROCEDURE for entering a NOTE on the notes tier
 # Prompt the user to enter notes about the transcription
 procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
 	beginPause("Transcription Notes")
@@ -930,8 +1136,7 @@ procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
 endproc
 
 
-
-
+#### PROCEDURE for FORMAT of PROMPT
 # These lines appear in every transcription prompt
 procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .target_number)
 	# Neither sound is currently being transcribed by default
@@ -957,6 +1162,3 @@ procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .target_num
 	comment(line_3$)
 	comment(line_4$)
 endproc
-
-
-
