@@ -228,6 +228,7 @@ lax$       = "Lax"
 length_aU$  = diphthong$
 length_aI$  = diphthong$
 length_oI$  = diphthong$
+length_oi$  = diphthong$
 # tense or long vowels
 length_i$   = tense$
 length_e$   = tense$
@@ -263,6 +264,7 @@ height_a$  = low$
 height_aU$ = height_a$
 height_aI$ = height_a$
 height_oI$ = height_o$
+height_oi$ = height_o$
 
 ##### VOWEL FRONTNESS
 # Vowel frontness feature values.
@@ -290,6 +292,7 @@ frontness_aI$ = frontness_I$
 frontness_aU$ = frontness_U$
 # the nucleus vowel for /oI/ (versus the other two diphthongs).
 frontness_oI$ = frontness_o$
+frontness_oi$ = frontness_o$
 
 ######## Transcribed nuclei that don't fit the above. 
 length_or$ = to_be_determined$
