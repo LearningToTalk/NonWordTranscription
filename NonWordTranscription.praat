@@ -22,7 +22,8 @@
 # Date: 01 May 2014
 # 09) vowel transcription changed to parallel consonant transcription
 # 10) transcription and scoring separated for non-canonical substitutions
-# 11) category of "unclassifiable" added to both C and V transcription
+# 11) category of "unclassifiable" added to both C and V transcription (and then later
+#       (on 06 May 2014) added "missing_data" to both, for noise or TOS or the like.
 # Left to do:
 # If we decide to adopt this strategy, should add way of making the correct transcription
 # be the default choice at each of the two steps.
@@ -160,9 +161,9 @@ while current_type < current_type_limit
 		# Find bounds of the textgrid interval containing the trial midpoint
 		@get_xbounds_in_textgrid_interval(segmentBasename$, segTextGridTrial, trialXMid)
 
-		# Use the XMin and XMax of the current trial to extract that
-		# portion of the segmented TextGrid. The TextGrid that this
-		# operation creates will have the name:
+		# Use the XMin and XMax of the current trial to extract that portion of the segmented 
+		# TextGrid, preserving the times. The TextGrid Object that this operation creates will 
+		# have the name:
 		# ::ExperimentalTask::_::ExperimentalID::_::SegmentersInitials::segm_part
 		@selectTextGrid(segmentBasename$)
 		Extract part: get_xbounds_in_textgrid_interval.xmin, get_xbounds_in_textgrid_interval.xmax, "yes"
@@ -174,21 +175,64 @@ while current_type < current_type_limit
 		@selectTextGrid(segmentBasename$ + "_part")
 		Remove
 
-		# Subset the 'segmentBasename$'_part Table to just the intervals
-		# on the Context Tier.
+		# Subset the 'segmentBasename$'_part Table to just the intervals on the Context Tier.
 		@selectTable(segmentBasename$ + "_part")
 		Extract rows where column (text): "tier", "is equal to", "Context"
 		@selectTable(segmentBasename$ + "_part")
 		Remove
 
-		# Get the Context label of the first segmented interval of this
-		# trial.
+		# Count the number of segmented intervals.
 		@selectTable(segmentBasename$ + "_part_Context")
-		contextLabel$ = Get value: 1, "text"
+		numResponses = Get number of rows
+		# If there is more than one segmented interval, ...
+		if numResponses > 1
+			# Zoom to the entire trial in the segmentation TextGrid object and 
+			# invite the transcriber to select the interval to transcribe.
+			editor TextGrid 'segmentBasename$'
+				Zoom: get_xbounds_in_textgrid_interval.xmin, get_xbounds_in_textgrid_interval.xmax
+			endeditor
+			beginPause("Choose repetition number to transcribe")
+				choice("Repetition number", 1)
+					for repnum from 1 to 'numResponses'
+						option("'repnum'")
+					endfor
+			button = endPause("Back", "Quit", "Choose repetition number", 3)
+		else
+			repetition_number = 1
+		endif
+
+		# Get the Context label of the chosen segmented interval of this trial and also then
+		# mark it off in the transcription textgrid ready to transcribe or skip as a NonResponse.
+		@selectTable(segmentBasename$ + "_part_Context")
+		contextLabel$ = Get value: repetition_number, "text"
+
+		# Determine the XMin and XMax of the segmented interval.
+		@get_xbounds_from_table(segmentBasename$ + "_part_Context", repetition_number)
+		segmentXMid = get_xbounds_from_table.xmid
+
+		@get_xbounds_in_textgrid_interval(segmentBasename$, segTextGridContext, segmentXMid)
+		segmentXMin = get_xbounds_in_textgrid_interval.xmin
+		segmentXMax = get_xbounds_in_textgrid_interval.xmax
+
+		# Add interval boundaries on each tier.
+		@selectTextGrid(transBasename$)
+		Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMin
+		Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMax
+		Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMin
+		Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMax
+		Insert boundary: nwr_trans_textgrid.prosody, segmentXMin
+		Insert boundary: nwr_trans_textgrid.prosody, segmentXMax
+
+		# Determine the target word and target segments. 
+		@selectTable(wordListBasename$ + "_" + trial_type$)
+		targetNonword$ = Get value: trial, wordListWorldBet$
+		target1$ = Get value: trial, wordListTarget1$
+		target2$ = Get value: trial, wordListTarget2$
+
 
 		# [TRANSCRIPTION EVENT LOOP]
 
-		# If the trial [context] is not a nonresponse, [zoom] into the interval
+		# If the trial [context] is a Response or UnpromptedResponse, [zoom] into the interval
 		# to be transcribed. Prompt user to transcribe [t1]. Determine [t1_score].
 		# Prompt user to transcribe [t2]. Determine [t2_score].
 		# Prompt user for [prosody] features. Determine [prosody_score], record [notes], 
@@ -210,47 +254,43 @@ while current_type < current_type_limit
 		trans_node$ = trans_node_context$
 
 		while (trans_node$ != trans_node_quit$) and (trans_node$ != trans_node_next_trial$)
-			# [CHECK IF NONRESPONSE]
+
+
+			# [CHECK IF RESPONSE, ETC.]
 			if trans_node$ == trans_node_context$
-				if contextLabel$ != "NonResponse"
+				if (contextLabel$ == "Response") or (contextLabel$=="UnpromptedResponse")
+					# If chosen interval is either of the transcribable types of response, proceed to transcription. 
 					trans_node$ = trans_node_zoom$
-				# Skip trial if nonresponse
+				elsif (contextLabel$ == "NonResponse") or (contextLabel$=="Perseveration")
+					# If chosen interval is a non-response of some kind, assign it a score of 0 on each tier
+					# and invite the transcriber to insert a note. 
+					transcription$ = "NonResponse; ;0"
+					@selectTextGrid(transBasename$)
+					segmentInterval = Get interval at time: nwr_trans_textgrid.target1_seg, segmentXMid
+					Set interval text: nwr_trans_textgrid.target1_seg, segmentInterval, transcription$
+					segmentInterval = Get interval at time: nwr_trans_textgrid.target2_seg, segmentXMid
+					Set interval text: nwr_trans_textgrid.target2_seg, segmentInterval, transcription$
+					segmentInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
+					Set interval text: nwr_trans_textgrid.prosody, segmentInterval, transcription$
+
+					trans_node$ = trans_node_notes_prompt$
 				else
-					trans_node$ = trans_node_save$
+					# Otherwise, assume something is wrong and just invite the transcriber to insert a note. 
+					trans_node$ = trans_node_notes_prompt$
 				endif
 			endif
 
-			# [PREP TEXTGRID FOR TRANSCRIPTION]
+			# [ZOOM TO SEGMENTED INTERVAL AND CHECK IT]
 			if trans_node$ == trans_node_zoom$
-				# Determine the XMin and XMax of the segmented interval.
-				@get_xbounds_from_table(segmentBasename$ + "_part_Context", 1)
-				segmentXMid = get_xbounds_from_table.xmid
-
-				@get_xbounds_in_textgrid_interval(segmentBasename$, segTextGridContext, segmentXMid)
-				segmentXMin = get_xbounds_in_textgrid_interval.xmin
-				segmentXMax = get_xbounds_in_textgrid_interval.xmax
-
-				# Add interval boundaries on each tier.
-				@selectTextGrid(transBasename$)
-				Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMin
-				Insert boundary: nwr_trans_textgrid.target1_seg, segmentXMax
-				Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMin
-				Insert boundary: nwr_trans_textgrid.target2_seg, segmentXMax
-				Insert boundary: nwr_trans_textgrid.prosody, segmentXMin
-				Insert boundary: nwr_trans_textgrid.prosody, segmentXMax
-
 				# Zoom to the segmented interval in the editor window.
 				editor TextGrid 'transBasename$'
 					Zoom: segmentXMin - 0.25, segmentXMax + 0.25
 				endeditor
 
-				@selectTable(wordListBasename$ + "_" + trial_type$)
-				targetNonword$ = Get value: trial, wordListWorldBet$
-				target1$ = Get value: trial, wordListTarget1$
-				target2$ = Get value: trial, wordListTarget2$
 				trans_node$ = trans_node_t1$
-			endif
 
+			endif
+				
 			# [TRANSCRIBE T1]
 			if trans_node$ == trans_node_t1$
 				@transcribe_segment(trialNumber$, targetNonword$, target1$, target2$, 1)
@@ -543,7 +583,6 @@ procedure get_xbounds_in_textgrid_interval(.textgrid$, .tier_num, .point)
 endproc
 
 
-
 #######################################################################
 # TIER-SPECIFIC PROCEDURE definitions start here
 
@@ -678,7 +717,7 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 				vowelFrontness$ = omitted$
 				vowel_node$ = vowel_node_score$
 
-			# Skip ahead to scoring node if vowel was unclassifiable.
+			# Skip ahead to scoring node also if vowel was unclassifiable.
 			elsif vowelLength$ == unclassifiable$
 				vowelSymbol$ = unclassifiable$
 				vowelLength$ = unclassifiable$
@@ -739,6 +778,7 @@ procedure transcribe_vowel_length(.trial_number$, .word$, .target1$, .target2$, 
 			option(omitted$)
 			option(other$)
 			option(unclassifiable$)
+			option(missing_data$)
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
@@ -950,6 +990,7 @@ procedure transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .
 			option(omitted$)
 			option(other$)
 			option(unclassifiable$)
+			option(missing_data$)
 	button = endPause("Quit", "Transcribe it!", 2)
 
 	if button == 1
