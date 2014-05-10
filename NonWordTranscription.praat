@@ -23,7 +23,7 @@
 # 09) vowel transcription changed to parallel consonant transcription
 # 10) transcription and scoring separated for non-canonical substitutions
 # 11) category of "unclassifiable" added to both C and V transcription (and then later
-#       (on 06 May 2014) added "missing_data" to both, for noise or TOS or the like.
+#       (on 06 May 2014) added "noise" to both, for noise or TOS or the like.
 # Left to do:
 # If we decide to adopt this strategy, should add way of making the correct transcription
 # be the default choice at each of the two steps.
@@ -305,6 +305,7 @@ while current_type < current_type_limit
 				Set interval text: nwr_trans_textgrid.target1_seg, segmentInterval, transcribe_segment.transcription$
 				trans_node$ = trans_node_t2$
 			endif
+# Should we skip T2 and Prosody if T1 is deemed to be noisy or the like?
 
 			# [TRANSCRIBE T2]
 			if trans_node$ == trans_node_t2$
@@ -725,6 +726,14 @@ procedure transcribe_vowel(.trial_number$, .word$, .target1$, .target2$, .target
 				vowelFrontness$ = unclassifiable$
 				vowel_node$ = vowel_node_score$
 
+			# Skip ahead to scoring node also if token could not be transcribed because of noise.
+			elsif vowelLength$ == noise$
+				vowelSymbol$ = noise$
+				vowelLength$ = missing_data$
+				vowelHeight$ = missing_data$
+				vowelFrontness$ = missing_data$
+				vowel_node$ = vowel_node_score$
+
 			# Otherwise, user chooses a worldbet symbol
 			else
 				@transcribe_vowel_symbol(.trial_number$, .word$, .target1$, .target2$, .target_number, vowelLength$)
@@ -778,7 +787,7 @@ procedure transcribe_vowel_length(.trial_number$, .word$, .target1$, .target2$, 
 			option(omitted$)
 			option(other$)
 			option(unclassifiable$)
-			option(missing_data$)
+			option(noise$)
 	button = endPause("Quit", "Transcribe it!", 2, 1)
 
 	if button == 1
@@ -879,12 +888,16 @@ endproc
 
 #### PROCEDURE to [SCORE VOWEL].
 procedure score_vowel(.target_v$, .symbol$, .length$, .height$, .frontness$)
-	# True = 1, False = 0, so we just add the truth values to the score
-	.score = 0
-	.score = .score + (length_'.target_v$'$ == .length$)
-	.score = .score + (height_'.target_v$'$ == .height$)
-	.score = .score + (frontness_'.target_v$'$ == .frontness$)
-	.transcription$ = "'.symbol$';'.length$','.height$','.frontness$';'.score'"
+	if .symbol$ == noise$
+		.transcription$ = "'.symbol$';'.length$','.height$','.frontness$';'missing_data$'"
+	else
+		# True = 1, False = 0, so we just add the truth values to the score
+		.score = 0
+		.score = .score + (length_'.target_v$'$ == .length$)
+		.score = .score + (height_'.target_v$'$ == .height$)
+		.score = .score + (frontness_'.target_v$'$ == .frontness$)
+		.transcription$ = "'.symbol$';'.length$','.height$','.frontness$';'.score'"
+	endif
 endproc
 
 ####  PROCEDURE : outer wrapper for nodes to prompt stages of CONSONANT transcription
@@ -930,6 +943,15 @@ procedure transcribe_consonant(.trial_number$, .word$, .target1$, .target2$, .ta
 				consonantManner$ = unclassifiable$
 				consonantPlace$ = unclassifiable$
 				consonantVoicing$ = unclassifiable$
+				cons_node$ = cons_node_score$
+
+			# Skip ahead to scoring node also if consonant could not be transcribed 
+			# because of noise or the like.
+			elsif consonantManner$ == noise$
+				consonantSymbol$ = noise$
+				consonantManner$ = missing_data$
+				consonantPlace$ = missing_data$
+				consonantVoicing$ = missing_data$
 				cons_node$ = cons_node_score$
 
 			# Otherwise, user chooses a WorldBet symbol from among those offered 
@@ -990,7 +1012,7 @@ procedure transcribe_cons_manner(.trial_number$, .word$, .target1$, .target2$, .
 			option(omitted$)
 			option(other$)
 			option(unclassifiable$)
-			option(missing_data$)
+			option(noise$)
 	button = endPause("Quit", "Transcribe it!", 2)
 
 	if button == 1
@@ -1147,12 +1169,16 @@ endproc
 
 #### PROCEDURE for scoring a CONSONANT
 procedure score_consonant(.target_c$, .symbol$, .manner$, .place$, .voicing$)
-	# True = 1, False = 0, so we just add the truth values to the score
-	.score = 0
-	.score = .score + (manner_'.target_c$'$ == .manner$)
-	.score = .score + (place_'.target_c$'$ == .place$)
-	.score = .score + (voicing_'.target_c$'$ == .voicing$)
-	.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'.score'"
+	if .symbol$ == noise$
+		.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'missing_data$'"
+	else
+		# True = 1, False = 0, so we just add the truth values to the score
+		.score = 0
+		.score = .score + (manner_'.target_c$'$ == .manner$)
+		.score = .score + (place_'.target_c$'$ == .place$)
+		.score = .score + (voicing_'.target_c$'$ == .voicing$)
+		.transcription$ = "'.symbol$';'.manner$','.place$','.voicing$';'.score'"
+	endif
 endproc
 
 
