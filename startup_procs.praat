@@ -147,6 +147,8 @@ endproc
 procedure startup_load_audio(.audio_dir$, .task$, .id_number$)
 	# Make the pattern to search for
 	.ext$ = if (macintosh or unix) then "WAV" else "wav" endif
+# The above is a problem, since mac OS and unix filenames are case-sensitive, so 
+# need to look for either.  Need to fix in next version.
 	.audio_pattern$ = .audio_dir$ + "/" + .task$ + "_" + .id_number$ + "*." + .ext$
 	
 	# Determine which .wav (or .WAV) file in the 'audio_dir$' directory has a filename

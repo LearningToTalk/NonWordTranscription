@@ -15,6 +15,7 @@ other$ = "Other"
 unclassifiable$ = "Unclassifiable"
 to_be_determined$ = "TBA"
 missing_data$ = "NA"
+noise$ = "Noise"
 
 ##### CONSONANT -- MANNER
 # Manner feature values for consonants.
