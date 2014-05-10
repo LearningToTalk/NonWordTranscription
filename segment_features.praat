@@ -14,7 +14,7 @@ omitted$   = "Omitted"
 other$ = "Other"
 unclassifiable$ = "Unclassifiable"
 to_be_determined$ = "TBA"
-
+missing_data$ = "NA"
 
 ##### CONSONANT -- MANNER
 # Manner feature values for consonants.
