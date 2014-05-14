@@ -30,7 +30,8 @@
 
 #######################################################################
 # Controls whether the @log_[...] procedures write to the InfoLines.
-debug_mode = 1
+# debug_mode = 1
+debug_mode = 0
 
 # Include the other files mentioned in change 7 of version 2.
 include check_version.praat
@@ -57,7 +58,7 @@ nTrialsCV = count_nwr_wordlist_structures.nTrialsCV
 nTrialsVC = count_nwr_wordlist_structures.nTrialsVC
 nTrialsCC = count_nwr_wordlist_structures.nTrialsCC
 
-# Check that the log and textgrid exist already
+# Check whether the log and textgrid exist already
 @nwr_trans_log("check", task$, experimental_ID$, initials$, transLogDirectory$, nTrialsCV, nTrialsVC, nTrialsCC)
 @nwr_trans_textgrid("check", task$, experimental_ID$, initials$, transDirectory$)
 
@@ -247,6 +248,7 @@ while current_type < current_type_limit
 		trans_node_prosody_score$ = "prosody_score"
 		trans_node_notes_prompt$ = "notes_prompt"
 		trans_node_notes_save$ = "notes_save"
+		trans_node_extract_snippet$ = "extract_snippet"
 		trans_node_save$ = "save"
 		trans_node_next_trial$ = "next_trial"
 		trans_node_quit$ = "quit"
@@ -305,7 +307,7 @@ while current_type < current_type_limit
 				Set interval text: nwr_trans_textgrid.target1_seg, segmentInterval, transcribe_segment.transcription$
 				trans_node$ = trans_node_t2$
 			endif
-# Should we skip T2 and Prosody if T1 is deemed to be noisy or the like?
+####  Issue: Should we skip T2 and Prosody if T1 is deemed to be noisy or the like?
 
 			# [TRANSCRIBE T2]
 			if trans_node$ == trans_node_t2$
@@ -358,6 +360,35 @@ while current_type < current_type_limit
 				if !transcribe_notes.no_notes
 					@selectTextGrid(transBasename$)
 					Insert point: nwr_trans_textgrid.notes, segmentXMid, transcribe_notes.notes$
+				endif
+				trans_node$ = trans_node_extract_snippet$
+			endif
+
+			# [EXTRACT AND SAVE SNIPPET]
+#### Issue: As soon as Mary or Pat has the time, this maybe should be rewritten as a call to a proc  
+####    that is stored in a separate file, for use in other scripts such as the segmentation script.
+			if trans_node$ == trans_node_extract_snippet$
+				# Extract and save a snippet only if the extract_snippet box was checked.
+				if transcribe_notes.snippet
+					@selectSound(audioBasename$)
+					Extract part: segmentXMin, segmentXMax, "rectangular", 1, "yes"
+					@selectTextGrid(transBasename$)
+					Extract part: segmentXMin, segmentXMax, "yes"
+					@selectTextGrid(segmentBasename$)
+					Extract part: segmentXMin, segmentXMax, "yes"
+					# The extracted snippet collection will be named by the basename for the transcription
+					# TextGrid plus the orthographic form for the nonword plus the repetition number. 
+					snippet_pathname$ = transcription_filepaths.transSnippetDirectory$ + "/" + transBasename$ + "_" + targetNonword$ + "_" + "'repetition_number'" + ".Collection"
+					# It will be saved as a binary praat .Collection file. 
+					selectObject("Sound " + audioBasename$ + "_part")
+					plusObject("TextGrid " + transBasename$ + "_part")
+					plusObject("TextGrid " + segmentBasename$ + "_part")
+					Save as binary file: snippet_pathname$
+					# The three extracted bits are removed from the Objects: window afterwards. 
+					selectObject("Sound " + audioBasename$ + "_part")
+					plusObject("TextGrid " + transBasename$ + "_part")
+					plusObject("TextGrid " + segmentBasename$ + "_part")
+					Remove
 				endif
 				trans_node$ = trans_node_save$
 			endif
@@ -1183,13 +1214,18 @@ endproc
 
 
 #### PROCEDURE for entering a NOTE on the notes tier
-# Prompt the user to enter notes about the transcription
+# Prompt the user to enter notes about the transcription and / or to extract a snippet
+# of the Sound Object and the transcription and segmentation TextGrid Objects to 
+# save in the ExtractedSnippets directory. 
 procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
 	beginPause("Transcription Notes")
 		@trial_header(.trial_number$, .word$, .target1$, .target2$, 0)
 
 		comment("You may enter any notes about this transcription below: ")
 		text("transcriber_notes", "")
+
+		comment("Should an audio and textgrid snippet be extracted for this trial?")
+		boolean("Extract snippet", 0)
 		
 	button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
 
@@ -1198,6 +1234,7 @@ procedure transcribe_notes(.trial_number$, .word$, .target1$, .target2$)
 	else
 		.notes$ = transcriber_notes$
 		.no_notes = length(.notes$) == 0
+		.snippet = extract_snippet
 		.result_node$ = node_next$
 	endif
 endproc
