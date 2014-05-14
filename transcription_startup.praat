@@ -61,6 +61,7 @@ while startup_node$ != startup_node_quit$ and startup_node$ != startup_node_tran
 		segmentDirectory$ = transcription_filepaths.segmentDirectory$
 		transDirectory$ = transcription_filepaths.transDirectory$
 		transLogDirectory$ = transcription_filepaths.transLogDirectory$
+		transSnippetDirectory$ = transcription_filepaths.transSnippetDirectory$
 		wordList_dir$ = transcription_filepaths.wordList_dir$
 		
 		# Prompt for ID
@@ -114,7 +115,7 @@ procedure startup_nwr_testwave()
 		comment ("Please choose the experimental task of the recording.")
 			optionMenu ("Task", 1)
 			option ("NonWordRep")
-		# Prompt the segmenter to specify the testwave (i.e., the "TimePoint") of the data.
+		# Prompt the transcriber to specify the testwave (i.e., the "TimePoint") of the data.
 		comment ("Please specify the test wave of the recording.")
 		optionMenu ("Testwave", 1)
 			option ("TimePoint1")
@@ -128,7 +129,7 @@ procedure startup_nwr_testwave()
 	elsif button == 2
 		.result_node$ = node_quit$
 	elsif button == 3
-		# If the segmenter chooses to 'Continue', then store the value
+		# If the transcriber chooses to 'Continue', then store the value
 		# of the 'task$' and 'testwave$' variables
 		.testwave$ = testwave$
 		.task$ = task$
@@ -170,6 +171,10 @@ procedure transcription_filepaths(.drive$, .audio_drive$, .task$, .testwave$)
 	.transDirectory$ = data_dir$ + "/Transcription/TranscriptionTextGrids"
 	.transLogDirectory$ = data_dir$ + "/Transcription/TranscriptionLogs"
 
+	# Where extracted "snippet" collections go
+	.transSnippetDirectory$ = data_dir$ + "/Transcription/ExtractedSnippets"
+
+	# WordList.txt files from
 	.wordList_dir$ = data_dir$ + "/WordLists"
 	
 	# Word List table columns
@@ -207,6 +212,7 @@ procedure log_transcription_filepaths()
 		appendInfoLine(tab$, ".segmentDirectory$: ", transcription_filepaths.segmentDirectory$)
 		appendInfoLine(tab$, ".transDirectory$: ", transcription_filepaths.transDirectory$)
 		appendInfoLine(tab$, ".transLogDirectory$: ", transcription_filepaths.transLogDirectory$)
+		appendInfoLine(tab$, ".transSnippetDirectory$: ", transcription_filepaths.transSnippetDirectory$)
 		appendInfoLine(tab$, ".wordList_dir$: ", transcription_filepaths.wordList_dir$)
 		appendInfoLine(tab$, ".wl_trial: ", transcription_filepaths.wl_trial)
 		appendInfoLine(tab$, ".wl_trial$: ", transcription_filepaths.wl_trial$)
