@@ -809,7 +809,7 @@ procedure transcribe_vowel_length(.trial_number$, .word$, .target1$, .target2$, 
 		comment("Choose from the following 3 sets of English vowel phones:")
 		comment("    diphthongs : /aI/, /aU/, /oI/") 
 		comment("    tense or long vowels : /i/, /e/, /ae/, /a/, /o/, /u/")
-		comment("    short or lax vowels : /I/, /E/, /3r/, /V/, /U/")
+		comment("    short or lax vowels : /I/, /E/, /3r/, /6/, /V/, /U/")
 		comment("or specify how the production does not fit into these sets.") 
 		choice("Vowel length", 2)
 			option(diphthong$)
@@ -854,6 +854,7 @@ procedure transcribe_vowel_symbol(.trial_number$, .word$, .target1$, .target2$, 
 				option("I")
 				option("E")
 				option("3r")
+				option("6")
 				option("V")
 				option("U")
 			elsif .length$ == other$

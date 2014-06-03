@@ -243,6 +243,7 @@ length_E$   = lax$
 length_U$   = lax$
 length_V$   = lax$
 length_3r$ = lax$
+length_6$ = lax$
 
 ##### VOWEL HEIGHT
 # Vowel height feature values
@@ -259,6 +260,7 @@ height_E$ = mid$
 height_V$  = mid$
 height_o$  = mid$
 height_3r$ = mid$
+height_6$ = mid$
 height_ae$ = low$
 height_a$  = low$
 # Diphthong height features are coded using the starting vowel (nucleus)
@@ -281,6 +283,7 @@ frontness_e$ = front$
 frontness_E$ = front$
 frontness_ae$ = front$
 frontness_3r$ = central$
+frontness_6$ = central$
 # frontness_3r$ = rhotic$
 frontness_u$  = back$
 frontness_U$  = back$
