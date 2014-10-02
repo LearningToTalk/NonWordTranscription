@@ -42,6 +42,7 @@
 #  14)  Cosmetic changes added, such as phonemic slashes (//) and reminders of the target and
 #       and how it has been transcribed, wherever appropriate.
 #  15)  Experiment exits gracefully.
+#  16) Update to allow for 4-point diphthong offglide scoring 
 
 #######################################################################
 # Controls whether the @log_[...] procedures write to the InfoLines.
