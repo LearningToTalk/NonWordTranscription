@@ -16,6 +16,7 @@ unclassifiable$ = "Unclassifiable"
 to_be_determined$ = "TBA"
 missing_data$ = "NA"
 noise$ = "Noise"
+not_applicable$ = "Feature not present"
 
 ##### CONSONANT -- MANNER
 # Manner feature values for consonants.
@@ -297,6 +298,25 @@ frontness_aU$ = frontness_U$
 # the nucleus vowel for /oI/ (versus the other two diphthongs).
 frontness_oI$ = frontness_o$
 frontness_oi$ = frontness_o$
+
+##VOWEL OFFGLIDES
+offglide_aU$ = frontness_U$
+offglide_aI$ = frontness_I$
+offglide_oI$ = frontness_I$
+offglide_oi$ = frontness_i$
+offglide_i$ = not_applicable$
+offglide_I$  = not_applicable$
+offglide_e$ = not_applicable$
+offglide_E$ = not_applicable$
+offglide_ae$ = not_applicable$
+offglide_3r$ = not_applicable$
+offglide_6$ = not_applicable$
+offglide_3r$ = not_applicable$
+offglide_u$  = not_applicable$
+offglide_U$  = not_applicable$
+offglide_o$  = not_applicable$
+offglide_V$  = not_applicable$
+offglide_a$  = not_applicable$
 
 ######## Transcribed nuclei that don't fit the above. 
 length_or$ = to_be_determined$

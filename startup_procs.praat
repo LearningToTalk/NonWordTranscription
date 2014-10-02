@@ -46,6 +46,7 @@ procedure startup_initials()
 		# Prompt the user to specify where the script is being run.
 		comment ("Please specify where the machine is on which you are working.")
 			optionMenu ("Location", 1)
+			option ("Generic")
 			option ("WaismanLab")
 			option ("ShevlinHallLab")
 			option ("Mac via RDC")
@@ -65,7 +66,11 @@ procedure startup_initials()
 		.location$ = location$
 		
 		# Use the value of the '.location$' variable to set up the 'drive$' variables.
-		if (.location$ == "WaismanLab")
+		if (.location$ == "Generic")
+			dirLength = length (defaultDirectory$) - 46
+			.drive$ = left$(defaultDirectory$, dirLength)
+			.audio_drive$ = left$(defaultDirectory$, dirLength)
+		elsif (.location$ == "WaismanLab")
 			.drive$ = "L:/"
 			.audio_drive$ = "L:/"
 		elsif (.location$ == "ShevlinHallLab")
