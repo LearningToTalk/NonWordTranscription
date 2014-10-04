@@ -165,7 +165,7 @@ procedure transcription_filepaths(.drive$, .audio_drive$, .task$, .testwave$)
 	.audio_dir$ = .audio_drive$ + "DataAnalysis/" + .task$ + "/" + .testwave$ + "/Recordings"
 	
 	# Segmentations ready to be transcribed from
-	.segmentDirectory$ = data_dir$ + "/Segmentation/TranscriptionReady"
+	.segmentDirectory$ = data_dir$ + "/Segmentation/TextGrids"
 	
 	# Where transcriptions and transcription logs go
 	.transDirectory$ = data_dir$ + "/Transcription/TranscriptionTextGrids"

@@ -46,6 +46,7 @@ procedure startup_initials()
 		# Prompt the user to specify where the script is being run.
 		comment ("Please specify where the machine is on which you are working.")
 			optionMenu ("Location", 1)
+			option ("Generic")
 			option ("WaismanLab")
 			option ("ShevlinHallLab")
 			option ("Mac via RDC")
@@ -53,7 +54,7 @@ procedure startup_initials()
 			option ("Other (Beckman)")
 			option ("Other (not Beckman)")
 	button = endPause ("Quit", "Continue", 2)
-	
+
 	# Use the 'button' variable to determine which node to transition to next.
 	if button == 1
 		.result_node$ = node_quit$
@@ -63,9 +64,13 @@ procedure startup_initials()
 		# then set the value of the .initials$ variable
 		.initials$ = your_initials$
 		.location$ = location$
-		
+
 		# Use the value of the '.location$' variable to set up the 'drive$' variables.
-		if (.location$ == "WaismanLab")
+		if (.location$ == "Generic")
+			dirLength = length (defaultDirectory$) - 46
+			.drive$ = left$(defaultDirectory$, dirLength)
+			.audio_drive$ = left$(defaultDirectory$, dirLength)
+		elsif (.location$ == "WaismanLab")
 			.drive$ = "L:/"
 			.audio_drive$ = "L:/"
 		elsif (.location$ == "ShevlinHallLab")
@@ -102,9 +107,6 @@ procedure log_initials()
 	endif
 endproc
 
-
-
-
 # [NODE] Prompt the user to choose the subject's experimental ID.
 procedure startup_id()
 	# Open a dialog box and prompt the user to specify the subject's 3-digit id no.
@@ -140,9 +142,6 @@ procedure log_startup_id()
 	endif
 endproc
 
-
-
-
 # [NODE] Load the audio file for this task.
 procedure startup_load_audio(.audio_dir$, .task$, .id_number$)
 	# Make the pattern to search for
@@ -150,12 +149,12 @@ procedure startup_load_audio(.audio_dir$, .task$, .id_number$)
 # The above is a problem, since mac OS and unix filenames are case-sensitive, so 
 # need to look for either.  Need to fix in next version.
 	.audio_pattern$ = .audio_dir$ + "/" + .task$ + "_" + .id_number$ + "*." + .ext$
-	
+
 	# Determine which .wav (or .WAV) file in the 'audio_dir$' directory has a filename
 	# that includes the id number of the subject presently being segmented.
 	Create Strings as file list: "wavFile", .audio_pattern$
 	n_wavs = Get number of strings
-	
+
 	# The resulting Strings object 'wavFile' should list exactly one .wav (or .WAV) 
 	# filename that corresponds to the correct audio file for this subject.
 	if (n_wavs > 0)
@@ -178,7 +177,7 @@ procedure startup_load_audio(.audio_dir$, .task$, .id_number$)
 		Read from file... '.audio_filepath$'
 		select Sound '.audio_basename$'
 		Rename... '.audio_sound$'
-		
+
 		.result_node$ = node_next$
 	else
 		# If the Strings object 'wavFile' has no filenames on it,
@@ -193,7 +192,7 @@ procedure startup_load_audio(.audio_dir$, .task$, .id_number$)
 			comment ("Also check that this directory contains a wave file whose basename")
 			comment ("      begins with 'task$'_'id_number$'.")
 		endPause ("Quit segmenting & check filesystem", 1, 1)
-	
+
 		.result_node$ = node_quit$
 	endif
 endproc
@@ -203,13 +202,13 @@ procedure log_load_audio()
 	if debug_mode
 		appendInfoLine("---- log_load_audio() ----")
 		appendInfoLine("Exit Status: ", startup_load_audio.result_node$)
-		
+
 		appendInfoLine("input parameters: ")
 		appendInfoLine(tab$, ".audio_dir$: ", startup_load_audio.audio_dir$)
 		appendInfoLine(tab$, ".task$: ", startup_load_audio.task$)
 		appendInfoLine(tab$, ".id_number$: ", startup_load_audio.id_number$)
 		appendInfoLine("")
-		
+
 		appendInfoLine("derived values: ")
 		appendInfoLine(tab$, ".ext$: ", startup_load_audio.ext$)
 		appendInfoLine(tab$, ".audio_pattern$: ", startup_load_audio.audio_pattern$)
@@ -225,9 +224,6 @@ procedure log_load_audio()
 	endif
 endproc
 
-
-
-
 # [NODE] Load the wordlist for this task.
 procedure startup_wordlist(.task$, .experimental_ID$, .drive$, .wordList_dir$)
 	# Make string variables for the word list table's basename,
@@ -237,9 +233,9 @@ procedure startup_wordlist(.task$, .experimental_ID$, .drive$, .wordList_dir$)
 	.wordList_filename$ = "'.wordList_basename$'.txt"
 	.wordList_filepath$ = "'.wordList_dir$'/'.wordList_filename$'"
 	.wordList_table$    = "'.experimental_ID$'_WordList"
-	
+
 	.wordList_exists = fileReadable(.wordList_filepath$)
-	
+
 	# What we do with this information depends on the task, because ...
 	if .task$ == "GFTA"
 		# If the task is GFTA, there is usually just one file for everyone.
@@ -251,7 +247,7 @@ procedure startup_wordlist(.task$, .experimental_ID$, .drive$, .wordList_dir$)
 		# thing so we'll reset the wordList_table$ variable.
 		.wordList_table$    =  "gfta_wordlist"
 	endif
-	
+
 	# Determine again whether a Word List table exists on the local file system.
 	.wordList_exists = fileReadable(.wordList_filepath$)
 	if (.wordList_exists)
@@ -260,14 +256,13 @@ procedure startup_wordlist(.task$, .experimental_ID$, .drive$, .wordList_dir$)
 		Read Table from tab-separated file... '.wordList_filepath$'
 		select Table '.wordList_basename$'
 		Rename... '.wordList_table$'
-		
+
 		# Determine the number of trials (both Familiarization and Test trials) 
 		# in this experimental session.
 		select Table '.wordList_table$'
 		.n_trials = Get number of rows
-		
+
 		.result_node$ = node_next$
-		
 	else
 		# If there is no Word List table on the local filesystem, first
 		# display an error message to the segmenter and then quit this 
@@ -278,7 +273,7 @@ procedure startup_wordlist(.task$, .experimental_ID$, .drive$, .wordList_dir$)
 			comment ("'.wordList_dir$'")
 			comment ("Also check that this directory contains a word list table whose filename is '.task$'_'.experimental_ID$'_WordList.txt.")
 		endPause ("Quit segmenting & check filesystem", 1, 1)
-		
+
 		.result_node$ = node_quit$
 	endif
 endproc
@@ -288,30 +283,26 @@ procedure log_startup_wordlist()
 	if debug_mode
 		appendInfoLine("---- log_startup_wordlist() ----")
 		appendInfoLine("Exit Status: ", startup_wordlist.result_node$)
-		
+
 		appendInfoLine("input parameters: ")
 		appendInfoLine(tab$, ".task$: ", startup_wordlist.task$)
 		appendInfoLine(tab$, ".experimental_ID$: ", startup_wordlist.experimental_ID$)
 		appendInfoLine(tab$, ".wordList_dir$: ", startup_wordlist.wordList_dir$)
 		appendInfoLine("")
-		
+
 		appendInfoLine("derived values: ")
 		appendInfoLine(tab$, ".wordList_basename$: ", startup_wordlist.wordList_basename$)
 		appendInfoLine(tab$, ".wordList_filename$: ", startup_wordlist.wordList_filename$)
 		appendInfoLine(tab$, ".wordList_filepath$: ", startup_wordlist.wordList_filepath$)
 		appendInfoLine(tab$, ".wordList_table$: ", startup_wordlist.wordList_table$)
 		appendInfoLine(tab$, ".wordList_exists: ", startup_wordlist.wordList_exists)
-		
+
 		if startup_wordlist.result_node$ != node_quit$
 			appendInfoLine(tab$, ".n_trials: ", startup_wordlist.n_trials)
 		endif
-		
 		appendInfoLine("")
 	endif
 endproc
-
-
-
 
 # [NODE] Load a segmentation textgrid
 procedure startup_segm_textgrid(.directory$, .task$, .experimental_ID$)
@@ -339,12 +330,12 @@ procedure startup_segm_textgrid(.directory$, .task$, .experimental_ID$)
 		.basename$ = .filename$ - ".TextGrid"
 		selectObject("Strings segmentedTextGrids")
 		Remove
-		
+
 		# Create a Table from the segmented TextGrid.
 		Read from file: .filepath$
 		@selectTextGrid(.basename$)
 		Down to Table: "no", 6, "yes", "no"
-		
+
 		.result_node$ = node_next$
 	# Otherwise, alert the user.
 	else
@@ -366,17 +357,17 @@ procedure log_startup_segm_textgrid()
 	if debug_mode
 		appendInfoLine("---- log_startup_segm_textgrid() ----")
 		appendInfoLine("Exit Status: ", startup_segm_textgrid.result_node$)
-		
+
 		appendInfoLine("input parameters: ")
 		appendInfoLine(tab$, ".directory$: ", startup_segm_textgrid.directory$)
 		appendInfoLine(tab$, ".task$: ", startup_segm_textgrid.task$)
 		appendInfoLine(tab$, ".experimental_ID$: ", startup_segm_textgrid.experimental_ID$)
 		appendInfoLine("")
-		
+
 		appendInfoLine("derived values: ")
 		appendInfoLine(tab$, ".segm_pattern$: ", startup_segm_textgrid.segm_pattern$)
 		appendInfoLine(tab$, ".n_grids: ", startup_segm_textgrid.n_grids)
-		
+
 		if startup_segm_textgrid.result_node$ == node_next$			
 			appendInfoLine(tab$, ".filename$: ", startup_segm_textgrid.filename$)
 			appendInfoLine(tab$, ".filepath$: ", startup_segm_textgrid.filepath$)
