@@ -271,6 +271,7 @@ while current_type < current_type_limit & !abort
 		trans_node_quit$ = "quit"
 
 		trans_node$ = trans_node_context$
+		transcriptionNecessary = 0
 
 		while (trans_node$ != trans_node_quit$) & (trans_node$ != trans_node_next_trial$)
 
@@ -349,26 +350,13 @@ while current_type < current_type_limit & !abort
 
 			# [TRANSCRIBE PROSODY]
 			if trans_node$ == trans_node_prosody$
-				@transcribe_prosody(targetNonword$, target1$ + target2$, transcription1$ + transcription2$)
+				@transcribe_prosody(targetNonword$, target1$, transcription1$, target2$, transcription2$)
 				prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
 				@check_worldBet(targetNonword$, transcribe_prosody.prosodyScore$)
 				Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, check_worldBet.text$
 				@next_back_quit(check_worldBet.result_node$, trans_node_notes_prompt$, "", trans_node_quit$)
 				trans_node$ = next_back_quit.result$
 			endif
-
-#			# [PROSODY SCORE]
-#			if trans_node$ == trans_node_prosody_score$
-#				# 3 points possible
-#				# -1 for deleting a segment
-#				# -1 for inserting a segment
-#				# -1 for adding or omitting syllables
-#				prosodyTranscription$ = transcribe_prosody.transcription$
-#				@selectTextGrid(transBasename$)
-#				prosodyInterval = Get interval at time: nwr_trans_textgrid.prosody, segmentXMid
-#				Set interval text: nwr_trans_textgrid.prosody, prosodyInterval, prosodyTranscription$
-#				trans_node$ = trans_node_notes_prompt$
-#			endif
 
 			# [PROMPT FOR NOTES]
 			if trans_node$ == trans_node_notes_prompt$
@@ -580,7 +568,7 @@ procedure nwr_trans_textgrid(.method$, .task$, .experimental_ID$, .initials$, .d
 	
 	.target1_seg$ = "Target1Seg"
 	.target2_seg$ = "Target2Seg"
-	.prosody$ = "FrameProsody"
+	.prosody$ = "ProsodyScore"
 	.notes$ = "TransNotes"
 	level_names$ = "'.target1_seg$' '.target2_seg$' '.prosody$' '.notes$'"
 	
@@ -648,22 +636,18 @@ endproc
 
 #### PROCEDURE to transcribe attributes of prosodic structure on tier for prosody points 
 # Prompt the transcriber to transcribe the target sequence prosodically.
-procedure transcribe_prosody(.word$, .target$, .transcription$)
-	beginPause("Prosodic Transcription")
-		comment("Please rate prosody for /'.target$'/ transcribed as /'.transcription$'/.")
-			choice ("Rating", 1)
-			option ("Correct")
-			option ("Incorrect")
-	button = endPause ("Quit", "Rate /'.target$'/ Production", 2, 1)
-
+procedure transcribe_prosody(.targetNonword$, .target1$, .transcription1$, .target2$, .transcription2$)
+	beginPause("Prosodic Transcription for '.targetNonword$'")
+		comment("Is prosody /'.target1$'/ transcribed as ['.transcription1$'] in its target position?")
+		boolean ("Target1 correct", 1)
+		comment("Is prosody /'.target2$'/ transcribed as ['.transcription2$'] in its target position?")
+		boolean ("Target2 correct", 1)
+		comment("Does the production of '.targetNonword$' have at least the target number of syllables?")
+		boolean ("Frame not shortened", 1)
+	button = endPause("Quit (without saving this trial)", "Rate Prosody", 2, 1)
 	if button == 1
 		.result_node$ = node_quit$
 	else
-		if rating$ = "Correct"
-			.prosodyScore$ = "1"
-		else
-			.prosodyScore$ = "0"
-		endif
 		.result_node$ = node_next$
 	endif
 endproc
@@ -686,8 +670,7 @@ procedure transcribe_segment(.trial_number$, .word$, .target1$, .target2$, .targ
 	# Store the transcription if it exists
 	if .result_node$ != node_quit$
 		.segmentTranscription$ = '.vowel_status$'Symbol$
-		@transcribe_prosody(.word$, .target'.target_number'$, .segmentTranscription$)
-		.transcription$ = transcribe_'.vowel_status$'.transcription$ + ";" + transcribe_prosody.prosodyScore$
+		.transcription$ = transcribe_'.vowel_status$'.transcription$
 	endif
 endproc
 
@@ -1287,11 +1270,11 @@ procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .transcript
 	line_4$ = "Target " + .type2$ + target2_is_current$ + ": /" + .target2$ + "/"
 
 	if .transcription1$ != ""
-		line_3$ =  line_3$ + ", transcribed as /'.transcription1$'/"
+		line_3$ =  line_3$ + ", transcribed as ['.transcription1$']"
 	endif
 
 	if .transcription2$ != ""
-		line_4$ =  line_4$ + ", transcribed as /'.transcription2$'/"
+		line_4$ =  line_4$ + ", transcribed as ['.transcription2$']"
 	endif
 
 	comment("Trial number: '.trial_number$'")
@@ -1300,8 +1283,8 @@ procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .transcript
 	comment(line_4$)
 endproc
 
-procedure check_worldBet(.word$, .score$)
-	if .score$ == "0"
+procedure check_worldBet(.word$)
+	if !(target1_correct & target2_correct & frame_not_shortened)
 		beginPause("Adjust Transcription")
 		comment("Please alter the WorldBet transcription to conform with your prosody rating")
 			text("transcription", .word$)
@@ -1311,10 +1294,10 @@ procedure check_worldBet(.word$, .score$)
 			.result_node$ = node_quit$
 		else
 			.result_node$ = node_next$
-			.text$ = .score$ + ";" + transcription$
+			.text$ = transcription$ + ";" +  string$ (target1_correct) + ";" + string$ (target2_correct) + ";" + string$ (frame_not_shortened)
 		endif
 	else
 		.result_node$ = node_next$
-		.text$ = .score$
+		.text$ = string$ (target1_correct) + ";" + string$ (target2_correct) + ";" + string$ (frame_not_shortened)
 	endif
 endproc
