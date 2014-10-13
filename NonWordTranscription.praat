@@ -54,7 +54,9 @@ abort = 0
 include check_version.praat
 include procs.praat
 include segment_features.praat
-include startup_procs.praat
+#include ../Utilities/L2T-Utilities.praat
+include ../StartupForm/L2T-StartupForm.praat
+#include startup_procs.praat
 include transcription_startup.praat
 
 # Numeric and string constants for the Word List Table.

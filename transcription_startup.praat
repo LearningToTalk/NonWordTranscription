@@ -26,79 +26,84 @@ if debug_mode
 	appendInfoLine("")
 endif
 
+@session_parameters
+@transcription_filepaths(session_parameters.analysis_directory$, session_parameters.analysis_directory$, session_parameters.experimental_task$, session_parameters.testwave$)
+wordList_dir$ = transcription_filepaths.wordList_dir$
+@startup_nwr_wordlist(session_parameters.experimental_task$, session_parameters.participant_number$, session_parameters.analysis_directory$, wordList_dir$)
+
 # Start-up wizard runs as long as the user has not quit or finished.
-while startup_node$ != startup_node_quit$ and startup_node$ != startup_node_transcribe$
-	# [INITIALS, LOCATION]
-	if startup_node$ == startup_node_initials$
-		@startup_initials()
-		@log_initials()
+#while startup_node$ != startup_node_quit$ and startup_node$ != startup_node_transcribe$
+#	# [INITIALS, LOCATION]
+#	if startup_node$ == startup_node_initials$
+#		@startup_initials()
+#		@log_initials()
 		
-		@next_back_quit(startup_initials.result_node$, startup_node_testwave$, "", startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_initials.result_node$, startup_node_testwave$, "", startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 		
-	# [TASK, TIMEPOINT]
-	elsif startup_node$ == startup_node_testwave$
-		@startup_nwr_testwave()
-		@log_nwr_testwave()
+#	# [TASK, TIMEPOINT]
+#	elsif startup_node$ == startup_node_testwave$
+#		@startup_nwr_testwave()
+#		@log_nwr_testwave()
 
-		@next_back_quit(startup_nwr_testwave.result_node$, startup_node_subject$, startup_node_initials$, startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_nwr_testwave.result_node$, startup_node_subject$, startup_node_initials$, startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 	
-	# [SUBJECT]
-	elsif startup_node$ == startup_node_subject$
+#	# [SUBJECT]
+#	elsif startup_node$ == startup_node_subject$
 		
-		# [LOCAL FILE SYSTEM VARIABLES] Use results from the previous nodes to generate filepaths
-		drive$ = startup_initials.drive$
-		audio_drive$ = startup_initials.audio_drive$
-		task$ = startup_nwr_testwave.task$
-		testwave$ = startup_nwr_testwave.testwave$
-		initials$ = startup_initials.initials$
+#		# [LOCAL FILE SYSTEM VARIABLES] Use results from the previous nodes to generate filepaths
+#		drive$ = startup_initials.drive$
+#		audio_drive$ = startup_initials.audio_drive$
+#		task$ = startup_nwr_testwave.task$
+#		testwave$ = startup_nwr_testwave.testwave$
+#		initials$ = startup_initials.initials$
 		
-		@transcription_filepaths(drive$, audio_drive$, task$, testwave$)
-		@log_transcription_filepaths()
+#		@transcription_filepaths(drive$, audio_drive$, task$, testwave$)
+#		@log_transcription_filepaths()
 		
-		audio_dir$ = transcription_filepaths.audio_dir$
-		segmentDirectory$ = transcription_filepaths.segmentDirectory$
-		transDirectory$ = transcription_filepaths.transDirectory$
-		transLogDirectory$ = transcription_filepaths.transLogDirectory$
-		transSnippetDirectory$ = transcription_filepaths.transSnippetDirectory$
-		wordList_dir$ = transcription_filepaths.wordList_dir$
+#		audio_dir$ = transcription_filepaths.audio_dir$
+#		segmentDirectory$ = transcription_filepaths.segmentDirectory$
+#		transDirectory$ = transcription_filepaths.transDirectory$
+#		transLogDirectory$ = transcription_filepaths.transLogDirectory$
+#		transSnippetDirectory$ = transcription_filepaths.transSnippetDirectory$
+#		wordList_dir$ = transcription_filepaths.wordList_dir$
 		
-		# Prompt for ID
-		@startup_id()
-		@log_startup_id()
+#		# Prompt for ID
+#		@startup_id()
+#		@log_startup_id()
 		
-		@next_back_quit(startup_id.result_node$, startup_node_audio$, startup_node_testwave$, startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_id.result_node$, startup_node_audio$, startup_node_testwave$, startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 
-	# [AUDIO FILE]
-	elsif startup_node$ == startup_node_audio$
-		id_number$ = startup_id.id_number$
-		@startup_load_audio(audio_dir$, task$, id_number$)
-		@log_load_audio()
+#	# [AUDIO FILE]
+#	elsif startup_node$ == startup_node_audio$
+#		id_number$ = startup_id.id_number$
+#		@startup_load_audio(audio_dir$, task$, id_number$)
+#		@log_load_audio()
 		
-		@next_back_quit(startup_load_audio.result_node$, startup_node_wordlist$, "", startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_load_audio.result_node$, startup_node_wordlist$, "", startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 
-	# [WORD LIST TABLE]
-	elsif startup_node$ == startup_node_wordlist$
-		audio_sound$ = startup_load_audio.audio_sound$
-		experimental_ID$ = startup_load_audio.experimental_ID$
-		@startup_nwr_wordlist(task$, experimental_ID$, drive$, wordList_dir$)
+#	# [WORD LIST TABLE]
+#	elsif startup_node$ == startup_node_wordlist$
+#		audio_sound$ = startup_load_audio.audio_sound$
+#		experimental_ID$ = startup_load_audio.experimental_ID$
+#		@startup_nwr_wordlist(task$, experimental_ID$, drive$, wordList_dir$)
 
-		@next_back_quit(startup_wordlist.result_node$, startup_node_segdata$, "", startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_wordlist.result_node$, startup_node_segdata$, "", startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 	
-	# [SEGMENTATION TEXTGRID]
-	elsif startup_node$ == startup_node_segdata$
-		@startup_segm_textgrid(segmentDirectory$, task$, experimental_ID$)
-		@log_startup_segm_textgrid()
+#	# [SEGMENTATION TEXTGRID]
+#	elsif startup_node$ == startup_node_segdata$
+#		@startup_segm_textgrid(segmentDirectory$, task$, experimental_ID$)
+#		@log_startup_segm_textgrid()
 		
-		@next_back_quit(startup_wordlist.result_node$, startup_node_quit$, "", startup_node_quit$)
-		startup_node$ = next_back_quit.result$
+#		@next_back_quit(startup_wordlist.result_node$, startup_node_quit$, "", startup_node_quit$)
+#		startup_node$ = next_back_quit.result$
 	
-	endif
-endwhile
+#	endif
+#endwhile
 
 
 
