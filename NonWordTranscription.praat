@@ -321,9 +321,15 @@ while current_type < current_type_limit & !abort
 						segmentInterval = Get interval at time: transcription_textgrid.prosody, segmentXMid
 						Set interval text: transcription_textgrid.prosody, segmentInterval, transcription$
 
+						#target1$, target2$
+						transcription1$ = ""
+						transcription2$ = ""
 						trans_node$ = trans_node_notes_prompt$
 					else
 						# Otherwise, assume something is wrong and just invite the transcriber to insert a note. 
+						#target1$, target2$
+						transcription1$ = ""
+						transcription2$ = ""						
 						trans_node$ = trans_node_notes_prompt$
 					endif
 				endif
