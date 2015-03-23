@@ -362,7 +362,6 @@ while current_type < current_type_limit & !abort
 					Set interval text: transcription_textgrid.target1_seg, segmentInterval, transcribe_segment.transcription$
 					trans_node$ = trans_node_t2$
 				endif
-####  Issue: Should we skip T2 and Prosody if T1 is deemed to be noisy or the like?
 
 				# [TRANSCRIBE T2]
 				if trans_node$ == trans_node_t2$
@@ -547,9 +546,15 @@ endproc
 procedure transcribe_prosody(.targetNonword$, .target1$, .transcription1$, .target2$, .transcription2$)
 	beginPause("Prosodic Transcription for '.targetNonword$'")
 		comment("Is prosody /'.target1$'/ transcribed as ['.transcription1$'] in its target position?")
-		boolean ("Target1 correct", 1)
+		choice("Target1 correct", 1)
+			option("1")
+ 			option("0")
+ 			option("NA")
 		comment("Is prosody /'.target2$'/ transcribed as ['.transcription2$'] in its target position?")
-		boolean ("Target2 correct", 1)
+		choice("Target2 correct", 1)
+			option("1")
+ 			option("0")
+ 			option("NA")
 		comment("Does the production of '.targetNonword$' have at least the target number of syllables?")
 		boolean ("Frame not shortened", 1)
 	button = endPause("Quit (without saving this trial)", "Rate Prosody", 2, 1)
@@ -788,7 +793,6 @@ procedure transcribe_vowel_height_frontness(.trial_number$, .word$, .target1$, .
 			comment("Enter the worldbet for this (non-English?) syllable nucleus: ")
 			text("Vowel transcription", "")
 	
-#		button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
 		button = endPause("Back", "Quit", "Transcribe it!", 3)
 
 		if button == 1
@@ -1060,7 +1064,6 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 			comment("Enter the worldbet for this non-English consonant: ")
 			text("Consonant transcription", "")
 	
-#		button = endPause("Quit (without saving this trial)", "Transcribe it!", 2, 1)
 		button = endPause("Back", "Quit", "Transcribe it!", 3)
 
 		if button == 1
@@ -1074,42 +1077,6 @@ procedure transcribe_cons_place_voice(.trial_number$, .word$, .target1$, .target
 			.place$ = to_be_determined$
 			.voicing$ = to_be_determined$
 		endif
-
-	# Alternatively, we might also prompt her to select the Manner, Place, and Voicing features 
-	# from drop-down menus? 
-#		beginPause("Consonant Transcription")
-#		@trial_header(.trial_number$, .word$, .target1$, .target2$, "", "", .target_number)
-#
-#			optionMenu("Consonant manner", 1)
-#				option(stop$)
-#				option(affricate$)
-#				option(fricative$)
-#				option(nasal$)
-#				option(glide$)
-#			optionMenu("Consonant place", 1)
-#				option(labial$)
-#				option(labiodental$)
-#				option(labiovelar$)
-#				option(dental$)
-#				option(alveolar$)
-#				option(postalveolar$)
-#				option(velar$)
-#				option(glottal$)
-#			optionMenu("Consonant voicing", 1)
-#				option(voiced$)
-#				option(voiceless$)
-#		button = endPause("Back", "Quit", "Transcribe it!", 3)
-#
-#		if button == 1
-#			.result_node$ = cons_node_back$
-#		elsif button == 2
-#			.result_node$ = cons_node_quit$
-#		else
-#			.result_node$ = cons_node_next$
-#			.place$ = consonant_place$
-#			.voicing$ = consonant_voicing$
-#		endif
-
 	endif
 
 endproc
