@@ -385,7 +385,7 @@ while current_type < current_type_limit & !abort
 				if trans_node$ == trans_node_prosody$
 					@transcribe_prosody(targetNonword$, target1$, transcription1$, target2$, transcription2$)
 					prosodyInterval = Get interval at time: transcription_textgrid.prosody, segmentXMid
-					@check_worldBet(targetNonword$, transcribe_prosody.prosodyScore$)
+					@check_worldBet(targetNonword$, transcribe_prosody.target1_correct$, transcribe_prosody.target2_correct$, transcribe_prosody.frame_not_shortened)
 					Set interval text: transcription_textgrid.prosody, prosodyInterval, check_worldBet.text$
 					@next_back_quit(check_worldBet.result_node$, trans_node_notes_prompt$, "", trans_node_quit$)
 					trans_node$ = next_back_quit.result$
@@ -1159,7 +1159,7 @@ procedure trial_header(.trial_number$, .word$, .target1$, .target2$, .transcript
 endproc
 
 procedure check_worldBet(.word$)
-	if !(target1_correct & target2_correct & frame_not_shortened)
+	if (target1_correct$ == "0") || (target2_correct$ == "0") || !(frame_not_shortened)
 		beginPause("Adjust Transcription")
 		comment("Please alter the WorldBet transcription to conform with your prosody rating")
 			text("transcription", .word$)
@@ -1169,7 +1169,7 @@ procedure check_worldBet(.word$)
 			.result_node$ = node_quit$
 		else
 			.result_node$ = node_next$
-			.text$ = transcription$ + ";" +  string$ (target1_correct) + ";" + string$ (target2_correct) + ";" + string$ (frame_not_shortened)
+			.text$ = transcription$ + ";" +  target1_correct$ + ";" + target2_correct$ + ";" + string$ (frame_not_shortened)
 		endif
 	else
 		.result_node$ = node_next$
