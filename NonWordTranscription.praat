@@ -1173,7 +1173,7 @@ procedure check_worldBet(.word$)
 		endif
 	else
 		.result_node$ = node_next$
-		.text$ = string$ (target1_correct) + ";" + string$ (target2_correct) + ";" + string$ (frame_not_shortened)
+		.text$ = target1_correct$ + ";" + target2_correct$ + ";" + string$ (frame_not_shortened)
 	endif
 endproc
 
